@@ -3,7 +3,6 @@ package com.github.logview.api;
 import com.github.logview.regex.RegexMultiMatcher;
 import com.github.logview.stringpart.api.Part;
 import com.github.logview.stringpart.api.PartCreator;
-import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.type.RefPart;
 import com.github.logview.stringpart.type.TagListPart;
@@ -13,7 +12,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 public class TagsImpl implements Tags {
-	private final PartFactory factory;
+	private final PartManager manager;
 	private final PartCreator stringFactory;
 	private final RegexMultiMatcher patterns;
 	private final String prefix;
@@ -45,7 +44,7 @@ public class TagsImpl implements Tags {
 				@Override
 				public Part load(String tags) throws Exception {
 					String[] ts = tags.split(" ");
-					TagListPart ret = new TagListPart(patterns, factory);
+					TagListPart ret = new TagListPart(patterns, manager);
 					for(int i = 0; i < ts.length; i++) {
 						ret.add(regexTagCache.get(ts[i]));
 					}
@@ -56,20 +55,20 @@ public class TagsImpl implements Tags {
 							b.length, ret.debug(), Util.toHex(b));
 					}
 					*/
-					return new RefPart(refs.add(ret), factory);
+					return new RefPart(refs.add(ret), manager);
 				}
 			});
 
-	public TagsImpl(RegexMultiMatcher patterns, PartFactory factory, RefManager refs, String prefix) {
+	public TagsImpl(RegexMultiMatcher patterns, PartManager manager, String prefix) {
 		this.patterns = patterns;
-		this.factory = factory;
-		this.refs = refs;
+		this.manager = manager;
+		this.refs = manager.getRefs();
 		this.prefix = prefix;
-		stringFactory = factory.getCreator(PartType.STRING);
+		stringFactory = manager.getFactory().getCreator(PartType.STRING);
 	}
 
-	public TagsImpl(PartFactory factory, RefManager refs, String prefix) {
-		this(null, factory, refs, prefix);
+	public TagsImpl(PartManager manager, String prefix) {
+		this(null, manager, prefix);
 	}
 
 	@Override

@@ -3,9 +3,9 @@ package com.github.logview.stringpart.type;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.regex.RegexMultiMatcher;
 import com.github.logview.stringpart.api.Part;
-import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.base.AbstractListPart;
 import com.github.logview.stringpart.base.AbstractPart;
@@ -17,20 +17,20 @@ public class TagListPart extends AbstractListPart {
 	private final LinkedHashSet<Part> parts = Sets.newLinkedHashSet();
 	private final RegexMultiMatcher patterns;
 
-	public TagListPart(ByteArrayDataInput data, PartFactory factory) {
-		this(new RegexMultiMatcher(data.readUTF(), factory), factory);
+	public TagListPart(ByteArrayDataInput data, PartManager manager) {
+		this(new RegexMultiMatcher(data.readUTF(), manager), manager);
 		int to = data.readByte();
 		for(int i = 0; i < to; i++) {
 			add(factory.createFrom(data));
 		}
 	}
 
-	public TagListPart(String data, PartFactory factory) {
-		this(new RegexMultiMatcher(data, factory), factory);
+	public TagListPart(String data, PartManager manager) {
+		this(new RegexMultiMatcher(data, manager), manager);
 	}
 
-	public TagListPart(RegexMultiMatcher patterns, PartFactory factory) {
-		super(PartType.TAGLIST, factory);
+	public TagListPart(RegexMultiMatcher patterns, PartManager manager) {
+		super(PartType.TAGLIST, manager);
 		this.patterns = patterns;
 	}
 

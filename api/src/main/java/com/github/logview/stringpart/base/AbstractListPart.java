@@ -1,14 +1,14 @@
 package com.github.logview.stringpart.base;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.Part;
-import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.api.SubPart;
 import com.google.common.io.ByteArrayDataOutput;
 
 public abstract class AbstractListPart extends AbstractPart implements SubPart {
-	protected AbstractListPart(PartType type, PartFactory factory) {
-		super(type, factory);
+	protected AbstractListPart(PartType type, PartManager manager) {
+		super(type, manager);
 	}
 
 	@Override

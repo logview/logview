@@ -7,23 +7,22 @@ import java.util.prefs.Preferences;
 import com.github.logview.regex.RegexMatcher;
 import com.github.logview.regex.RegexMultiMatcher;
 import com.github.logview.stringpart.api.Part;
-import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.util.AutomaticScanner;
 import com.github.logview.util.Util;
 
 public class Importer {
-	public static void load(String prefix, PartFactory factory, Loader loader) throws Exception {
+	public static void load(String prefix, PartManager manager, Loader loader) throws Exception {
 		Preferences prefs = Preferences.userNodeForPackage(Importer.class);
 		String path = prefs.get("path", null);
 		if(path == null) {
 			throw new RuntimeException("please set path pref!");
 		}
-		load(prefix, path, factory, loader);
+		load(prefix, path, manager, loader);
 	}
 
-	public static void load(String key, String path, PartFactory factory, Loader loader) throws Exception {
+	public static void load(String key, String path, PartManager manager, Loader loader) throws Exception {
 		RegexMultiMatcher parser = new RegexMultiMatcher(
-				Util.loadProps(Importer.class, "../settings/format.properties"), factory);
+				Util.loadProps(Importer.class, "../settings/format.properties"), manager);
 		Importer.loadPath(parser.get(key), path, loader);
 	}
 

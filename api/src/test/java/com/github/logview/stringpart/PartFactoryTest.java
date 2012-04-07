@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.Part;
 import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.stringpart.api.PartType;
@@ -14,7 +15,8 @@ import com.github.logview.stringpart.type.ListPart;
 import com.google.common.io.ByteStreams;
 
 public class PartFactoryTest {
-	private final PartFactory factory = new PartFactory();
+	private final PartManager manager = new PartManager();
+	private final PartFactory factory = manager.getFactory();
 
 	@Test
 	public void testBaToList() {

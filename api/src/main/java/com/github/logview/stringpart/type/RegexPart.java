@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.regex.Config;
 import com.github.logview.stringpart.api.Part;
-import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.base.AbstractListPart;
 import com.google.common.io.ByteArrayDataInput;
@@ -16,23 +16,23 @@ public class RegexPart extends AbstractListPart {
 	private final Config config;
 	private final ArrayList<Part> parts = new ArrayList<Part>();
 
-	public RegexPart(String config, PartFactory factory) {
-		this(Config.create(config, factory), factory);
+	public RegexPart(String config, PartManager manager) {
+		this(Config.create(config, manager), manager);
 	}
 
-	public RegexPart(Config config, PartFactory factory) {
-		this(config, new LinkedList<Part>(), factory);
+	public RegexPart(Config config, PartManager manager) {
+		this(config, new LinkedList<Part>(), manager);
 	}
 
-	public RegexPart(Config config, Collection<Part> parts, PartFactory factory) {
-		super(PartType.REGEX, factory);
+	public RegexPart(Config config, Collection<Part> parts, PartManager manager) {
+		super(PartType.REGEX, manager);
 		this.config = config;
 		parts.addAll(parts);
 	}
 
-	public RegexPart(ByteArrayDataInput data, PartFactory factory) {
-		super(PartType.REGEX, factory);
-		this.config = Config.create(data.readUTF(), factory);
+	public RegexPart(ByteArrayDataInput data, PartManager manager) {
+		super(PartType.REGEX, manager);
+		this.config = Config.create(data.readUTF(), manager);
 	}
 
 	@Override

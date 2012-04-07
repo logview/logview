@@ -1,22 +1,22 @@
 package com.github.logview.stringpart.type;
 
-import com.github.logview.stringpart.api.PartFactory;
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.base.AbstractPart;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 public class EmptyPart extends AbstractPart {
-	public EmptyPart(PartFactory factory) {
-		super(PartType.EMPTY, factory);
+	public EmptyPart(PartManager manager) {
+		super(PartType.EMPTY, manager);
 	}
 
-	public EmptyPart(ByteArrayDataInput data, PartFactory factory) {
-		this(factory);
+	public EmptyPart(ByteArrayDataInput data, PartManager manager) {
+		this(manager);
 	}
 
-	public EmptyPart(String data, PartFactory factory) {
-		this(factory);
+	public EmptyPart(String data, PartManager manager) {
+		this(manager);
 	}
 
 	@Override

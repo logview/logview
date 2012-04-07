@@ -1,6 +1,6 @@
 package com.github.logview.stringpart.type;
 
-import com.github.logview.stringpart.api.PartFactory;
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.base.AbstractPart;
 import com.google.common.io.ByteArrayDataInput;
@@ -9,17 +9,17 @@ import com.google.common.io.ByteArrayDataOutput;
 public class BytePart extends AbstractPart {
 	private final byte data;
 
-	public BytePart(byte data, PartFactory factory) {
-		super(PartType.BYTE, factory);
+	public BytePart(byte data, PartManager manager) {
+		super(PartType.BYTE, manager);
 		this.data = data;
 	}
 
-	public BytePart(ByteArrayDataInput data, PartFactory factory) {
-		this(data.readByte(), factory);
+	public BytePart(ByteArrayDataInput data, PartManager manager) {
+		this(data.readByte(), manager);
 	}
 
-	public BytePart(String data, PartFactory factory) {
-		this(Byte.parseByte(data), factory);
+	public BytePart(String data, PartManager manager) {
+		this(Byte.parseByte(data), manager);
 	}
 
 	@Override

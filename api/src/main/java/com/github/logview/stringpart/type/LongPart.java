@@ -1,6 +1,6 @@
 package com.github.logview.stringpart.type;
 
-import com.github.logview.stringpart.api.PartFactory;
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.base.AbstractPart;
 import com.google.common.io.ByteArrayDataInput;
@@ -9,17 +9,17 @@ import com.google.common.io.ByteArrayDataOutput;
 public class LongPart extends AbstractPart {
 	private final long data;
 
-	public LongPart(long data, PartFactory factory) {
-		super(PartType.LONG, factory);
+	public LongPart(long data, PartManager manager) {
+		super(PartType.LONG, manager);
 		this.data = data;
 	}
 
-	public LongPart(ByteArrayDataInput data, PartFactory factory) {
-		this(data.readLong(), factory);
+	public LongPart(ByteArrayDataInput data, PartManager manager) {
+		this(data.readLong(), manager);
 	}
 
-	public LongPart(String data, PartFactory factory) {
-		this(Long.parseLong(data), factory);
+	public LongPart(String data, PartManager manager) {
+		this(Long.parseLong(data), manager);
 	}
 
 	@Override

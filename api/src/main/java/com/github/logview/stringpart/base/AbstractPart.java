@@ -1,5 +1,6 @@
 package com.github.logview.stringpart.base;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.Part;
 import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.stringpart.api.PartType;
@@ -10,10 +11,12 @@ import com.google.common.io.ByteArrayDataOutput;
 public abstract class AbstractPart implements Part {
 	protected final PartType type;
 	protected final PartFactory factory;
+	protected final PartManager manager;
 
-	protected AbstractPart(PartType type, PartFactory factory) {
+	protected AbstractPart(PartType type, PartManager manager) {
 		this.type = type;
-		this.factory = factory;
+		this.manager = manager;
+		this.factory = manager.getFactory();
 	}
 
 	@Override

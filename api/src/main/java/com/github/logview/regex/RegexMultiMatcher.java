@@ -8,8 +8,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.Part;
-import com.github.logview.stringpart.api.PartFactory;
 
 public class RegexMultiMatcher implements RegexMatcher {
 	private final Map<String, RegexConfigMatcher> map = new LinkedHashMap<String, RegexConfigMatcher>();
@@ -17,20 +17,20 @@ public class RegexMultiMatcher implements RegexMatcher {
 	public RegexMultiMatcher() {
 	}
 
-	public RegexMultiMatcher(String data, PartFactory factory) {
+	public RegexMultiMatcher(String data, PartManager manager) {
 		for(String config : data.split("\n")) {
 			String[] kv = config.split("|", 2);
-			map.put(kv[0], new RegexConfigMatcher(new Config(kv[1], factory)));
+			map.put(kv[0], new RegexConfigMatcher(new Config(kv[1], manager)));
 		}
 	}
 
-	public RegexMultiMatcher(Properties props, PartFactory factory) {
+	public RegexMultiMatcher(Properties props, PartManager manager) {
 		for(Object key : props.keySet()) {
 			String prefix = (String)key;
 			if(prefix.indexOf('.') != -1) {
 				continue;
 			}
-			map.put(prefix, new RegexConfigMatcher(Config.load(prefix, props, factory)));
+			map.put(prefix, new RegexConfigMatcher(Config.load(prefix, props, manager)));
 		}
 	}
 

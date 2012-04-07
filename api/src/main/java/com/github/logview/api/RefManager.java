@@ -17,4 +17,8 @@ public class RefManager {
 		refs.put(rnd, ref);
 		return rnd;
 	}
+
+	public Part get(int value) {
+		return refs.get(value);
+	}
 }

@@ -28,7 +28,7 @@ public class RegexConfigMatcher implements RegexMatcher {
 		if(count == 0) {
 			return config.createPart(0, pm.group(0));
 		}
-		RegexPart ret = new RegexPart(config, config.getFactory());
+		RegexPart ret = new RegexPart(config, config.getManager());
 		for(int i = 0; i < max; i++) {
 			ret.add(config.createPart(i, pm.group(i + 1)));
 		}

@@ -1,6 +1,7 @@
 package com.github.logview.stringpart.type;
 
-import com.github.logview.stringpart.api.PartFactory;
+import com.github.logview.api.PartManager;
+import com.github.logview.stringpart.api.Part;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.base.AbstractPart;
 import com.google.common.io.ByteArrayDataInput;
@@ -9,17 +10,17 @@ import com.google.common.io.ByteArrayDataOutput;
 public class RefPart extends AbstractPart {
 	private final int data;
 
-	public RefPart(int data, PartFactory factory) {
-		super(PartType.REF, factory);
+	public RefPart(int data, PartManager manager) {
+		super(PartType.REF, manager);
 		this.data = data;
 	}
 
-	public RefPart(ByteArrayDataInput data, PartFactory factory) {
-		this(data.readInt(), factory);
+	public RefPart(ByteArrayDataInput data, PartManager manager) {
+		this(data.readInt(), manager);
 	}
 
-	public RefPart(String data, PartFactory factory) {
-		this(Integer.parseInt(data), factory);
+	public RefPart(String data, PartManager manager) {
+		this(Integer.parseInt(data), manager);
 	}
 
 	@Override
@@ -33,7 +34,7 @@ public class RefPart extends AbstractPart {
 	}
 
 	@Override
-	public Integer value() {
-		return data;
+	public Part value() {
+		return manager.getRefs().get(data);
 	}
 }

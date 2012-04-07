@@ -11,8 +11,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.Part;
-import com.github.logview.stringpart.api.PartFactory;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.type.RegexPart;
 import com.github.logview.stringtable.StringTableDebugImpl;
@@ -23,9 +23,9 @@ public class RegexMultiMatcherTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
-		PartFactory factory = new PartFactory();
+		PartManager manager = new PartManager();
 		parser = new RegexMultiMatcher(Util.loadProps(RegexMultiMatcherTest.class, "regexlineparser.properties"),
-				factory);
+				manager);
 	}
 
 	@Test

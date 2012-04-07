@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.Part;
 import com.github.logview.stringpart.api.PartCreator;
 import com.github.logview.stringpart.api.PartFactory;
@@ -30,10 +31,11 @@ public class Config {
 	private final static Pattern splitter = Pattern.compile("[\\(\\)]");
 	private final PartCreator dateCreator;
 	private final PartCreator booleanCreator;
-	private final PartFactory factory;
+	private final PartManager manager;
 
-	public Config(String config, PartFactory factory) {
-		this.factory = factory;
+	public Config(String config, PartManager manager) {
+		this.manager = manager;
+		PartFactory factory = manager.getFactory();
 		dateCreator = factory.getCreator(PartType.DATE);
 		booleanCreator = factory.getCreator(PartType.BOOLEAN);
 
@@ -143,7 +145,7 @@ public class Config {
 		return sb.toString();
 	}
 
-	public static Config load(String prefix, Properties props, PartFactory factory) {
+	public static Config load(String prefix, Properties props, PartManager manager) {
 		String regex = props.getProperty(prefix);
 
 		int max = 0;
@@ -196,11 +198,11 @@ public class Config {
 		sb.append('|');
 		sb.append(regex);
 
-		return create(sb.toString(), factory);
+		return create(sb.toString(), manager);
 	}
 
-	public static Config create(String config, PartFactory factory) {
-		return new Config(config, factory);
+	public static Config create(String config, PartManager manager) {
+		return new Config(config, manager);
 	}
 
 	public int size() {
@@ -278,7 +280,7 @@ public class Config {
 		}
 	}
 
-	public PartFactory getFactory() {
-		return factory;
+	public PartManager getManager() {
+		return manager;
 	}
 }

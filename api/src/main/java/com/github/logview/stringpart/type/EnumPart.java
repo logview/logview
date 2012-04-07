@@ -1,6 +1,6 @@
 package com.github.logview.stringpart.type;
 
-import com.github.logview.stringpart.api.PartFactory;
+import com.github.logview.api.PartManager;
 import com.github.logview.stringpart.api.PartType;
 import com.github.logview.stringpart.base.AbstractPart;
 import com.google.common.io.ByteArrayDataInput;
@@ -9,17 +9,17 @@ import com.google.common.io.ByteArrayDataOutput;
 public class EnumPart extends AbstractPart {
 	private final byte data;
 
-	public EnumPart(byte data, PartFactory factory) {
-		super(PartType.ENUM, factory);
+	public EnumPart(byte data, PartManager manager) {
+		super(PartType.ENUM, manager);
 		this.data = data;
 	}
 
-	public EnumPart(ByteArrayDataInput data, PartFactory factory) {
-		this(data.readByte(), factory);
+	public EnumPart(ByteArrayDataInput data, PartManager manager) {
+		this(data.readByte(), manager);
 	}
 
-	public EnumPart(String data, PartFactory factory) {
-		this(Byte.parseByte(data), factory);
+	public EnumPart(String data, PartManager manager) {
+		this(Byte.parseByte(data), manager);
 	}
 
 	@Override
