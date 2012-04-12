@@ -33,4 +33,9 @@ public abstract class AbstractValue implements Value {
 		}
 		return string;
 	}
+
+	@Override
+	public String getRegex() {
+		return regex;
+	}
 }
