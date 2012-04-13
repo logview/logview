@@ -1,23 +1,21 @@
 package com.github.logview.value.api;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.logview.regex.Match;
+import com.github.logview.matcher.Match;
 import com.github.logview.util.Util;
-import com.github.logview.value.type.BooleanValue;
-import com.github.logview.value.type.DoubleValue;
-import com.github.logview.value.type.LongValue;
-import com.github.logview.value.type.SessionHostValue;
-import com.github.logview.value.type.SessionValue;
-import com.github.logview.value.type.UuidValue;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public final class ValueFactory implements ValueOf, ValueAnalyser {
 	private final LoadingCache<String, Pattern> patternCache = CacheBuilder.newBuilder().weakValues()
@@ -28,37 +26,66 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 				}
 			});
 
-	private final static Set<Value> types = new Builder<Value>()
-	//
-			.add(new BooleanValue()) //
-			.add(new BooleanValue("TRUE", "FALSE")) //
-			.add(new SessionHostValue(false)) //
-			.add(new SessionHostValue(true)) //
-			.add(new SessionValue(false)) //
-			.add(new SessionValue(true)) //
-			.add(new UuidValue(false)) //
-			.add(new UuidValue(true)) //
-			.add(new DoubleValue(false)) //
-			.add(new DoubleValue(true)) //
-			.add(new LongValue()) //
-			.build();
-
-	private final static ValueFactory instance = new ValueFactory();
+	private final Map<String, Value> types = Maps.newLinkedHashMap();
 
 	private final static Pattern token = Pattern.compile("\\$\\([^\\)]*?\\)");
 
-	private ValueFactory() {
+	private final static ValueFactory instance;
+
+	static {
+		instance = new ValueFactory();
+		instance.loadDefaults();
 	}
 
-	public static ValueFactory getInstance() {
+	public static ValueFactory getDefault() {
 		return instance;
+	}
+
+	public void loadDefaults() {
+		try {
+			load(ValueFactory.class, "../../settings/types.txt");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void load(Class<?> clazz, String resource) throws IOException {
+		load(Util.loadList(ValueFactory.class, resource));
+	}
+
+	public void load(Collection<String> types) {
+		for(String type : types) {
+			load(type);
+		}
+	}
+
+	public void load(String type) {
+		String[] t = type.split(" ");
+		ValueType vt = ValueType.valueOf(t[0]);
+		Class<? extends Value> clazz = vt.getValueClass();
+		Map<ValueParams, String> data = Maps.newLinkedHashMap();
+		if(t.length != 1) {
+			for(int i = 1; i < t.length; i++) {
+				String[] kv = t[i].split(":", 2);
+				if(kv.length != 2) {
+					throw new IllegalArgumentException("missing ':' in 'key:value': '" + t[i] + "'");
+				}
+				data.put(ValueParams.valueOf(kv[0].toUpperCase()), Util.unescapeSpace(kv[1]));
+			}
+		}
+		try {
+			types.put(type, clazz.getConstructor(Map.class).newInstance(ImmutableMap.copyOf(data)));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public String analyse(String string) {
 		String ret = string;
-		for(Value type : types) {
-			ret = type.analyse(ret);
+		for(Entry<String, Value> entry : types.entrySet()) {
+			// do not use types.values(), wrong order!
+			ret = entry.getValue().analyse(ret);
 		}
 		return ret;
 	}
@@ -72,16 +99,9 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 			Matcher m = token.matcher(ret);
 			if(m.find()) {
 				String g = m.group();
-				g = g.substring(2, g.length() - 1);
-				boolean found = false;
-				for(Value type : types) {
-					if(g.equals(type.getType() + type.getExtra())) {
-						ret = m.replaceFirst("(" + Util.escapeReplace(type.getRegex()) + ")");
-						found = true;
-						break;
-					}
-				}
-				if(found) {
+				Value type = types.get(g.substring(2, g.length() - 1));
+				if(type != null) {
+					ret = m.replaceFirst("(" + Util.escapeReplace(type.getRegex()) + ")");
 					continue;
 				}
 			}
@@ -92,7 +112,7 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 
 	@Override
 	public Object valueOf(String string) {
-		for(Value type : types) {
+		for(Value type : types.values()) {
 			Object ret = type.valueOf(string);
 			if(ret != null) {
 				return ret;
@@ -115,5 +135,9 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 
 	public Pattern getPattern(String match) {
 		return patternCache.getUnchecked(match);
+	}
+
+	public void reset() {
+		types.clear();
 	}
 }

@@ -1,11 +1,11 @@
 package com.github.logview.api;
 
-import com.github.logview.stringpart.api.Part;
+import com.github.logview.matcher.Match;
 
 public interface Tags {
-	Part getTag(String tag);
+	Match getTag(String tag);
 
-	Part getTags(String tags);
+	Match getTags(String tags);
 
 	void close();
 }

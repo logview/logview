@@ -1,13 +1,12 @@
 package com.github.logview.value.api;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.logview.regex.Match;
+import com.github.logview.matcher.Match;
 
 public class RegexValueTest {
-	private final ValueFactory subject = ValueFactory.getInstance();
+	private final ValueFactory subject = ValueFactory.getDefault();
 
 	@Test
 	public void testDouble() {

@@ -1,32 +1,34 @@
 package com.github.logview.api;
 
 import java.io.File;
+import java.util.List;
 import java.util.Scanner;
 import java.util.prefs.Preferences;
 
-import com.github.logview.regex.RegexMatcher;
-import com.github.logview.regex.RegexMultiMatcher;
-import com.github.logview.stringpart.api.Part;
+import com.github.logview.matcher.Match;
+import com.github.logview.matcher.Matcher;
+import com.github.logview.matcher.ValueMatcher;
 import com.github.logview.util.AutomaticScanner;
 import com.github.logview.util.Util;
+import com.github.logview.value.api.ValueFactory;
+import com.google.common.collect.Lists;
 
 public class Importer {
-	public static void load(String prefix, PartManager manager, Loader loader) throws Exception {
+	public static void load(ValueFactory factory, String prefix, Loader loader) throws Exception {
 		Preferences prefs = Preferences.userNodeForPackage(Importer.class);
 		String path = prefs.get("path", null);
 		if(path == null) {
 			throw new RuntimeException("please set path pref!");
 		}
-		load(prefix, path, manager, loader);
+		load(factory, prefix, path, loader);
 	}
 
-	public static void load(String key, String path, PartManager manager, Loader loader) throws Exception {
-		RegexMultiMatcher parser = new RegexMultiMatcher(
-				Util.loadProps(Importer.class, "../settings/format.properties"), manager);
-		Importer.loadPath(parser.get(key), path, loader);
+	public static void load(ValueFactory factory, String key, String path, Loader loader) throws Exception {
+		String mach = Util.loadString(Importer.class, "../settings/format.properties", key);
+		Importer.loadPath(new ValueMatcher(factory, mach), path, loader);
 	}
 
-	public static void loadPath(RegexMatcher parser, String path, Loader loader) throws Exception {
+	public static void loadPath(Matcher parser, String path, Loader loader) throws Exception {
 		File dir = new File(path);
 		for(File file : dir.listFiles()) {
 			if(!file.isFile()) {
@@ -38,34 +40,35 @@ public class Importer {
 		}
 	}
 
-	public static void loadLog(RegexMatcher parser, File file, Appender appender, LogFile logfile) throws Exception {
-		Part entry = null;
+	public static void loadLog(Matcher parser, File file, Appender appender, LogFile logfile) throws Exception {
 		Scanner scanner = AutomaticScanner.create(file);
 
 		try {
 			final long a = System.currentTimeMillis();
 			long bytes = 0;
+			Match last = null;
+			List<String> lines = Lists.newLinkedList();
 			while(scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				bytes += line.length();
-				if(bytes >= 1024 * 1024 * 100) {
+				if(bytes >= 1024 * 1024 * 10) {
 					break;
 				}
-				Part current = parser.match(line);
-				if(current != null) {
-					if(entry != null) {
-						// entryNo++;
-						appender.append(logfile, entry);
+				Match match = parser.match(line);
+				if(match != null) {
+					if(last != null) {
+						appender.append(logfile, new Entry(last, lines));
+						lines.clear();
 					}
-					entry = current;
-				} else if(entry != null) {
-					// entry.addLine(line);
+					last = match;
+				} else {
+					lines.add(line);
 				}
 			}
 
 			System.err.printf("%d ms\n", System.currentTimeMillis() - a);
-			if(entry != null) {
-				appender.append(logfile, entry);
+			if(last != null) {
+				appender.append(logfile, new Entry(last, lines));
 			}
 		} finally {
 			scanner.close();

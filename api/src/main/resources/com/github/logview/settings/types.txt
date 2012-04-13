@@ -1,0 +1,11 @@
+BOOLEAN
+BOOLEAN true:TRUE false:FALSE
+SESSIONHOST
+SESSIONHOST uppercase:true
+SESSION
+SESSION uppercase:true
+UUID
+UUID uppercase:true
+DOUBLE
+DOUBLE dot:false
+LONG

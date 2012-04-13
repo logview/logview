@@ -1,7 +1,9 @@
 package com.github.logview.value.api;
 
-public interface Value extends ValueOf, ValueAnalyser {
-	String getType();
+import com.github.logview.params.Params;
+
+public interface Value extends ValueOf, ValueAnalyser, Params {
+	ValueType getType();
 
 	String getRegex();
 

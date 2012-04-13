@@ -6,16 +6,26 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ValueFactoryValueOfTest {
-	private final ValueFactory subject = ValueFactory.getInstance();
-
 	@Test
 	public void testNull() {
+		testNull(new ValueFactory());
+		testNull(ValueFactory.getDefault());
+	}
+
+	private void testNull(ValueFactory subject) {
 		Assert.assertNull(subject.valueOf(null));
 		Assert.assertEquals("", subject.valueOf(""));
 	}
 
 	@Test
 	public void testDouble() {
+		ValueFactory subject = new ValueFactory();
+		subject.load("DOUBLE");
+		testDouble(subject);
+		testDouble(ValueFactory.getDefault());
+	}
+
+	private void testDouble(ValueFactory subject) {
 		Object result = subject.valueOf("0.0");
 		Assert.assertTrue(result instanceof Double);
 		Assert.assertEquals(0.0, result);
@@ -31,6 +41,13 @@ public class ValueFactoryValueOfTest {
 
 	@Test
 	public void testLong() {
+		ValueFactory subject = new ValueFactory();
+		subject.load("LONG");
+		testLong(subject);
+		testLong(ValueFactory.getDefault());
+	}
+
+	private void testLong(ValueFactory subject) {
 		Object result = subject.valueOf("0");
 		Assert.assertTrue(result instanceof Long);
 		Assert.assertEquals(0L, result);
@@ -46,6 +63,13 @@ public class ValueFactoryValueOfTest {
 
 	@Test
 	public void testSession() {
+		ValueFactory subject = new ValueFactory();
+		subject.load("SESSION");
+		testSession(subject);
+		testSession(ValueFactory.getDefault());
+	}
+
+	private void testSession(ValueFactory subject) {
 		String session = "00000000000000000000000000000000";
 		Object result = subject.valueOf(session);
 		Assert.assertTrue(result instanceof String);
@@ -59,6 +83,13 @@ public class ValueFactoryValueOfTest {
 
 	@Test
 	public void testSessionHost() {
+		ValueFactory subject = new ValueFactory();
+		subject.load("SESSIONHOST");
+		testSessionHost(subject);
+		testSessionHost(ValueFactory.getDefault());
+	}
+
+	private void testSessionHost(ValueFactory subject) {
 		String session = "00000000000000000000000000000000.ip-1-2-3-4";
 		Object result = subject.valueOf(session);
 		Assert.assertTrue(result instanceof String);
@@ -72,6 +103,14 @@ public class ValueFactoryValueOfTest {
 
 	@Test
 	public void testBoolean() {
+		ValueFactory subject = new ValueFactory();
+		subject.load("BOOLEAN");
+		subject.load("BOOLEAN true:TRUE false:FALSE");
+		testBoolean(subject);
+		testBoolean(ValueFactory.getDefault());
+	}
+
+	private void testBoolean(ValueFactory subject) {
 		Object result = subject.valueOf("true");
 		Assert.assertTrue(result instanceof Boolean);
 		Assert.assertTrue((Boolean)result);
@@ -91,6 +130,14 @@ public class ValueFactoryValueOfTest {
 
 	@Test
 	public void testUuid() {
+		ValueFactory subject = new ValueFactory();
+		subject.load("UUID");
+		subject.load("UUID uppercase:true");
+		testUuid(subject);
+		testUuid(ValueFactory.getDefault());
+	}
+
+	private void testUuid(ValueFactory subject) {
 		UUID uuid = UUID.randomUUID();
 
 		Object result = subject.valueOf(uuid.toString().toLowerCase());

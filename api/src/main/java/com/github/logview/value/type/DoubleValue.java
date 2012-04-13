@@ -1,18 +1,29 @@
 package com.github.logview.value.type;
 
+import java.util.Map;
+
+import com.github.logview.params.Params;
+import com.github.logview.value.api.ValueParams;
+import com.github.logview.value.api.ValueType;
 import com.github.logview.value.base.AbstractRegexValue;
 
 public class DoubleValue extends AbstractRegexValue {
+	private final static ValueType type = ValueType.DOUBLE;
+
 	private final boolean dot;
 
-	public DoubleValue(boolean dot) {
-		super("(\\-?)(\\d+)" + (dot ? "\\." : ",") + "(\\d+)");
-		this.dot = dot;
+	public DoubleValue(Map<ValueParams, String> data) {
+		this(type.create(data));
+	}
+
+	private DoubleValue(Params params) {
+		super("(\\-?)(\\d+)" + (params.getParamAsBoolean(ValueParams.DOT) ? "\\." : ",") + "(\\d+)", params);
+		this.dot = params.getParamAsBoolean(ValueParams.DOT);
 	}
 
 	@Override
-	public String getType() {
-		return "DOUBLE";
+	public ValueType getType() {
+		return type;
 	}
 
 	@Override

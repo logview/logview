@@ -1,17 +1,27 @@
 package com.github.logview.value.type;
 
+import java.util.Map;
 import java.util.UUID;
 
+import com.github.logview.params.Params;
+import com.github.logview.value.api.ValueParams;
+import com.github.logview.value.api.ValueType;
 import com.github.logview.value.base.AbstractCaseRegexValue;
 
 public class UuidValue extends AbstractCaseRegexValue {
-	public UuidValue(boolean uppercase) {
-		super("[0-9A-F]{8}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{12}", uppercase);
+	public final static ValueType TYPE = ValueType.UUID;
+
+	public UuidValue(Map<ValueParams, String> data) {
+		this(TYPE.create(data));
+	}
+
+	private UuidValue(Params params) {
+		super("[0-9A-F]{8}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{4}\\-[0-9A-F]{12}", params);
 	}
 
 	@Override
-	public String getType() {
-		return "UUID";
+	public ValueType getType() {
+		return TYPE;
 	}
 
 	@Override

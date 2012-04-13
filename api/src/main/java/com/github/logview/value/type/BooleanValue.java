@@ -1,24 +1,31 @@
 package com.github.logview.value.type;
 
+import java.util.Map;
+
+import com.github.logview.params.Params;
+import com.github.logview.value.api.ValueParams;
+import com.github.logview.value.api.ValueType;
 import com.github.logview.value.base.AbstractValue;
 
 public class BooleanValue extends AbstractValue {
+	private final static ValueType type = ValueType.BOOLEAN;
+
 	private final String t;
 	private final String f;
 
-	public BooleanValue() {
-		this("true", "false");
+	public BooleanValue(Map<ValueParams, String> data) {
+		this(type.create(data));
 	}
 
-	public BooleanValue(String t, String f) {
-		super(t + "|" + f);
-		this.t = t;
-		this.f = f;
+	private BooleanValue(Params params) {
+		super(params.getParamAsString(ValueParams.TRUE) + "|" + params.getParamAsString(ValueParams.FALSE), params);
+		this.t = params.getParamAsString(ValueParams.TRUE);
+		this.f = params.getParamAsString(ValueParams.FALSE);
 	}
 
 	@Override
-	public String getType() {
-		return "BOOLEAN";
+	public ValueType getType() {
+		return type;
 	}
 
 	@Override
@@ -29,20 +36,6 @@ public class BooleanValue extends AbstractValue {
 			return false;
 		}
 		return null;
-	}
-
-	@Override
-	public String getExtra() {
-		StringBuilder sb = new StringBuilder();
-		if(!"true".equals(t)) {
-			sb.append(" true:");
-			sb.append(t);
-		}
-		if(!"false".equals(f)) {
-			sb.append(" false:");
-			sb.append(f);
-		}
-		return sb.toString();
 	}
 
 	@Override

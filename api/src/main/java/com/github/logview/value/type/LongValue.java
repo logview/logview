@@ -1,15 +1,26 @@
 package com.github.logview.value.type;
 
+import java.util.Map;
+
+import com.github.logview.params.Params;
+import com.github.logview.value.api.ValueParams;
+import com.github.logview.value.api.ValueType;
 import com.github.logview.value.base.AbstractRegexValue;
 
 public class LongValue extends AbstractRegexValue {
-	public LongValue() {
-		super("\\-?\\d+");
+	private final static ValueType type = ValueType.LONG;
+
+	public LongValue(Map<ValueParams, String> data) {
+		this(type.create(data));
+	}
+
+	private LongValue(Params params) {
+		super("\\-?\\d+", params);
 	}
 
 	@Override
-	public String getType() {
-		return "LONG";
+	public ValueType getType() {
+		return type;
 	}
 
 	@Override

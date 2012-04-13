@@ -4,11 +4,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Scanner;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
@@ -47,8 +51,8 @@ public class Util {
 		return string.replaceAll("\\\\", "\\\\\\\\").replaceAll("\\$", "\\\\\\$");
 	}
 
-	public static String space(String string) {
-		return string.replaceAll("[^_]?_", " ").replaceAll("__", "_");
+	public static String unescapeSpace(String string) {
+		return string.replaceAll("\\\\_", " ");
 	}
 
 	public static String toHex(byte[] bytes) {
@@ -75,5 +79,24 @@ public class Util {
 			}
 		}
 		return null;
+	}
+
+	public static List<String> loadList(Class<?> clazz, String resource) throws IOException {
+		InputStream stream = clazz.getResourceAsStream(resource);
+		if(stream == null) {
+			throw new FileNotFoundException(resource);
+		}
+
+		Scanner scanner = new Scanner(clazz.getResourceAsStream(resource));
+		List<String> ret = Lists.newLinkedList();
+
+		try {
+			while(scanner.hasNextLine()) {
+				ret.add(scanner.nextLine());
+			}
+		} finally {
+			scanner.close();
+		}
+		return ImmutableList.copyOf(ret);
 	}
 }

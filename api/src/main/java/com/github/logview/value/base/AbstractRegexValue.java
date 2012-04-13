@@ -3,13 +3,14 @@ package com.github.logview.value.base;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.logview.params.Params;
 import com.github.logview.util.Util;
 
 public abstract class AbstractRegexValue extends AbstractValue {
 	private final Pattern matcher;
 
-	public AbstractRegexValue(String regex) {
-		super(Util.removeGroups(regex));
+	protected AbstractRegexValue(String regex, Params params) {
+		super(Util.removeGroups(regex), params);
 		this.matcher = Pattern.compile("^" + regex + "$");
 	}
 
