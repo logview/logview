@@ -18,6 +18,9 @@ public class ValueFactoryAnalyseTest {
 	private static final String TYPE_D1 = "DOUBLE";
 	private static final String TYPE_D2 = "DOUBLE dot:false";
 	private static final String TYPE_L = "LONG";
+	private static final String TYPE_T = "DATE format:HH:mm:ss,SSS";
+	private static final String TYPE_W = "WORD";
+	private static final String TYPE_S = "STRING";
 
 	private void testSame(String type, String string) {
 		testSame(type, string, string, string);
@@ -51,10 +54,31 @@ public class ValueFactoryAnalyseTest {
 
 	@Test
 	public void testLong() {
-		testSame(TYPE_L, "test long:$(LONG)", "test long:0");
-		testSame(TYPE_L, "test long:$(LONG)", "test long:10");
-		testSame(TYPE_L, "test long:$(LONG)", "test long:-10");
-		testSame(TYPE_L, "test long:$(LONG)$(LONG)$(LONG)", "test long:123-123-123");
+		testSame(TYPE_L, "test long:$(" + TYPE_L + ")", "test long:0");
+		testSame(TYPE_L, "test long:$(" + TYPE_L + ")", "test long:10");
+		testSame(TYPE_L, "test long:$(" + TYPE_L + ")", "test long:-10");
+		testSame(TYPE_L, "test long:$(" + TYPE_L + ")$(" + TYPE_L + ")$(" + TYPE_L + ")", "test long:123-123-123");
+	}
+
+	@Test
+	public void testDate() {
+		testSame(TYPE_T, "test date:$(" + TYPE_T + ")", "test date:12:34:56,789");
+	}
+
+	@Test
+	public void testWord() {
+		testSame(TYPE_W, "$(" + TYPE_W + ")", "word", "word");
+		testSame(TYPE_W, "$(" + TYPE_W + ") ", "word ", "word ");
+		testSame(TYPE_W, " $(" + TYPE_W + ")", " word", " word");
+		testSame(TYPE_W, " $(" + TYPE_W + ") ", " word ", " word ");
+	}
+
+	@Test
+	public void testString() {
+		testSame(TYPE_S, "$(" + TYPE_S + ")", "test string", "test string");
+		testSame(TYPE_S, "$(" + TYPE_S + ") ", "test string ", "test string ");
+		testSame(TYPE_S, " $(" + TYPE_S + ")", " test string", " test string");
+		testSame(TYPE_S, " $(" + TYPE_S + ") ", " test string ", " test string ");
 	}
 
 	@Test

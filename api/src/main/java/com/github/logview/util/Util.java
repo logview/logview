@@ -44,7 +44,7 @@ public class Util {
 	}
 
 	public static String escape(String string) {
-		return string.replaceAll("\\.", "\\.").replaceAll("\\(", "\\(").replaceAll("\\)", "\\)");
+		return string.replaceAll("([\\\\\\$\\^\\.\\(\\)])", "\\\\$1");
 	}
 
 	public static String escapeReplace(String string) {
@@ -98,5 +98,14 @@ public class Util {
 			scanner.close();
 		}
 		return ImmutableList.copyOf(ret);
+	}
+
+	public static String removeRegexSpaces(String match) {
+		String ret = removeGroups(match);
+		ret = ret.replaceAll("^\\^", "");
+		ret = ret.replaceAll("\\$$", "");
+		ret = ret.replaceAll("\\\\[sS][\\+\\*]?\\??", " ");
+		ret = ret.replaceAll("\\\\(.)", "$1");
+		return ret;
 	}
 }

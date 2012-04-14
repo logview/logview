@@ -15,7 +15,11 @@ public class ValueFactoryToRegexTest {
 		testSame(null, null);
 		testSame("", "");
 		testSame("test123...", "test123...");
-		testSame("$(test123...)", "$(test123...)");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testTypeNotFound() {
+		subject.toRegex("$(test)");
 	}
 
 	@Test
@@ -32,6 +36,11 @@ public class ValueFactoryToRegexTest {
 	@Test
 	public void testLong() {
 		testSame("(\\-?\\d+)", "$(LONG)");
+	}
+
+	@Test
+	public void testDate() {
+		testSame("(\\d{2}\\:\\d{2}\\:\\d{2},\\d{3})", "$(DATE format:HH:mm:ss,SSS)");
 	}
 
 	@Test

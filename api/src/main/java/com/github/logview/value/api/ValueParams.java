@@ -5,6 +5,10 @@ public enum ValueParams {
 	FALSE,
 	DOT,
 	UPPERCASE,
+	FORMAT,
+	NAME,
+	TRIM,
+	MIN,
 	//
 	;
 

@@ -15,6 +15,24 @@ public abstract class AbstractParams implements Params {
 	}
 
 	@Override
+	public Integer getParamAsInt(ValueParams key) {
+		String ret = getParamAsStringOrNull(key);
+		if(ret == null) {
+			return null;
+		}
+		return Integer.parseInt(ret);
+	}
+
+	@Override
+	public String getParamAsString(ValueParams key) {
+		String ret = getParamAsStringOrNull(key);
+		if(ret == null) {
+			throw new RuntimeException("key '" + key + "' not found!");
+		}
+		return ret;
+	}
+
+	@Override
 	public String getParamsAsString() {
 		StringBuilder sb = new StringBuilder();
 		for(ValueParams key : getParams()) {

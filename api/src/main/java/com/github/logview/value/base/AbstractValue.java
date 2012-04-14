@@ -21,8 +21,8 @@ public abstract class AbstractValue extends AbstractParams implements Value {
 	}
 
 	@Override
-	public String getParamAsString(ValueParams key) {
-		return params.getParamAsString(key);
+	public String getParamAsStringOrNull(ValueParams key) {
+		return params.getParamAsStringOrNull(key);
 	}
 
 	@Override

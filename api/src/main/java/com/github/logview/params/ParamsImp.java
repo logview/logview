@@ -16,7 +16,7 @@ public class ParamsImp extends AbstractParams {
 	}
 
 	@Override
-	public String getParamAsString(ValueParams key) {
+	public String getParamAsStringOrNull(ValueParams key) {
 		String ret = data.get(key);
 		if(ret == null) {
 			ret = definition.getDefault(key);

@@ -2,6 +2,7 @@ package com.github.logview.value.api;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,7 +29,7 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 
 	private final Map<String, Value> types = Maps.newLinkedHashMap();
 
-	private final static Pattern token = Pattern.compile("\\$\\([^\\)]*?\\)");
+	private final static Pattern token = Pattern.compile("\\$\\(([^\\)]*?)\\)");
 
 	private final static ValueFactory instance;
 
@@ -94,18 +95,31 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		if(string == null) {
 			return null;
 		}
-		String ret = Util.escape(string);
+		String ret = string;
 		while(true) {
 			Matcher m = token.matcher(ret);
 			if(m.find()) {
-				String g = m.group();
-				Value type = types.get(g.substring(2, g.length() - 1));
-				if(type != null) {
-					ret = m.replaceFirst("(" + Util.escapeReplace(type.getRegex()) + ")");
-					continue;
-				}
+				Value type = getType(m.group());
+				ret = m.replaceFirst("(" + Util.escapeReplace(type.getRegex()) + ")");
+				continue;
 			}
 			break;
+		}
+		return ret;
+	}
+
+	public Value getType(String type) {
+		String t = type;
+		if(t.startsWith("$(") && t.endsWith(")")) {
+			t = t.substring(2, t.length() - 1);
+		}
+		Value ret = types.get(t);
+		if(ret == null) {
+			load(t);
+		}
+		ret = types.get(t);
+		if(ret == null) {
+			throw new IllegalArgumentException("Type '" + t + "' not found!");
 		}
 		return ret;
 	}
@@ -122,13 +136,21 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 	}
 
 	public Match parse(String match, String string) {
-		Matcher m = getPattern(match).matcher(string);
+		return parse(getPattern(match), match, string);
+	}
+
+	public Match parse(Pattern pattern, String match, String string) {
+		Matcher m = pattern.matcher(string);
 		if(m.matches()) {
 			List<Object> data = Lists.newLinkedList();
+			Matcher ma = token.matcher(match);
 			for(int i = 0; i < m.groupCount(); i++) {
-				data.add(valueOf(m.group(i + 1)));
+				if(!ma.find()) {
+					throw new IllegalArgumentException("no match found!");
+				}
+				data.add(getType(ma.group(1)).valueOf(m.group(i + 1)));
 			}
-			return new Match(match, data);
+			return new Match(this, match, string, data);
 		}
 		return null;
 	}
@@ -139,5 +161,31 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 
 	public void reset() {
 		types.clear();
+	}
+
+	public String toString(String match, List<Object> data) {
+		String ret = match;
+		Iterator<Object> it = data.iterator();
+		while(true) {
+			Matcher m = token.matcher(ret);
+			if(!m.find()) {
+				if(it.hasNext()) {
+					throw new IllegalArgumentException("too many arguments!");
+				}
+				return Util.removeRegexSpaces(ret);
+			}
+			if(!it.hasNext()) {
+				throw new IllegalArgumentException("too few arguments!");
+			}
+			ret = m.replaceFirst(Util.escape(Util.escape(getType(m.group()).format(it.next()))));
+		}
+	}
+
+	public Value getType(int index, String match) {
+		Matcher ma = token.matcher(match);
+		if(ma.find(index + 1)) {
+			return getType(ma.group(1));
+		}
+		throw new IllegalArgumentException();
 	}
 }

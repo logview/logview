@@ -5,21 +5,27 @@ import java.util.Map;
 import com.github.logview.params.Params;
 import com.github.logview.params.ParamsDefinition;
 import com.github.logview.value.type.BooleanValue;
+import com.github.logview.value.type.DateValue;
 import com.github.logview.value.type.DoubleValue;
 import com.github.logview.value.type.LongValue;
 import com.github.logview.value.type.SessionHostValue;
 import com.github.logview.value.type.SessionValue;
+import com.github.logview.value.type.StringValue;
 import com.github.logview.value.type.UuidValue;
+import com.github.logview.value.type.WordValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 public enum ValueType {
 	BOOLEAN(BooleanValue.class, ValueParamsDefinitions.booleanParams),
+	DATE(DateValue.class, ValueParamsDefinitions.formatParams),
 	DOUBLE(DoubleValue.class, ValueParamsDefinitions.doubleParams),
 	LONG(LongValue.class, ValueParamsDefinitions.emptyParams),
 	SESSIONHOST(SessionHostValue.class, ValueParamsDefinitions.uppercaseParams),
 	SESSION(SessionValue.class, ValueParamsDefinitions.uppercaseParams),
+	STRING(StringValue.class, ValueParamsDefinitions.stringParams),
 	UUID(UuidValue.class, ValueParamsDefinitions.uppercaseParams),
+	WORD(WordValue.class, ValueParamsDefinitions.wordParams),
 	//
 	;
 

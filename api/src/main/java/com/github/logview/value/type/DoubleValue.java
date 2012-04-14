@@ -42,4 +42,12 @@ public class DoubleValue extends AbstractRegexValue {
 		}
 		return " dot:false";
 	}
+
+	@Override
+	public String format(Object data) {
+		if(data instanceof Double) {
+			return Double.toString((Double)data);
+		}
+		throw new IllegalArgumentException();
+	}
 }

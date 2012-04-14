@@ -42,4 +42,12 @@ public class BooleanValue extends AbstractValue {
 	public String analyse(String string) {
 		return analyseOneStep(string);
 	}
+
+	@Override
+	public String format(Object data) {
+		if(data instanceof Boolean) {
+			return Boolean.toString((Boolean)data);
+		}
+		throw new IllegalArgumentException();
+	}
 }

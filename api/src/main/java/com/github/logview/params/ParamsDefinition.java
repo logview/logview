@@ -1,11 +1,13 @@
 package com.github.logview.params;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.github.logview.value.api.ValueParams;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class ParamsDefinition {
@@ -23,12 +25,12 @@ public class ParamsDefinition {
 		this(defaults, emptySet, emptySet);
 	}
 
-	public ParamsDefinition(Set<ValueParams> allowed) {
-		this(emptyMap, allowed, emptySet);
+	public ParamsDefinition(Set<ValueParams> required) {
+		this(emptyMap, emptySet, required);
 	}
 
-	public ParamsDefinition(Map<ValueParams, String> defaults, Set<ValueParams> allowed) {
-		this(defaults, allowed, emptySet);
+	public ParamsDefinition(Map<ValueParams, String> defaults, Set<ValueParams> required) {
+		this(defaults, emptySet, required);
 	}
 
 	public ParamsDefinition(Map<ValueParams, String> defaults, Set<ValueParams> allowed, Set<ValueParams> required) {
@@ -36,9 +38,12 @@ public class ParamsDefinition {
 		a.addAll(defaults.keySet());
 		a.addAll(allowed);
 		a.addAll(required);
+		a.add(ValueParams.NAME);
 		this.allowed = ImmutableSet.copyOf(a);
 		this.required = ImmutableSet.copyOf(required);
-		this.defaults = ImmutableMap.copyOf(defaults);
+		LinkedHashMap<ValueParams, String> d = Maps.newLinkedHashMap(defaults);
+		d.put(ValueParams.TRIM, "true");
+		this.defaults = ImmutableMap.copyOf(d);
 	}
 
 	public Params create(Map<ValueParams, String> data) {
@@ -52,10 +57,6 @@ public class ParamsDefinition {
 	}
 
 	public String getDefault(ValueParams key) {
-		String ret = defaults.get(key);
-		if(ret == null) {
-			throw new RuntimeException("key '" + key + "' not found!");
-		}
-		return ret;
+		return defaults.get(key);
 	}
 }

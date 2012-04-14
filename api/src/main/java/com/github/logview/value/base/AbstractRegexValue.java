@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import com.github.logview.params.Params;
 import com.github.logview.util.Util;
+import com.github.logview.value.api.ValueParams;
 
 public abstract class AbstractRegexValue extends AbstractValue {
 	private final Pattern matcher;
@@ -33,8 +34,24 @@ public abstract class AbstractRegexValue extends AbstractValue {
 	public Object valueOf(String string) {
 		String[] match = match(string);
 		if(match != null) {
-			return match[0];
+			String ret = match[0];
+			if(params.getParamAsBoolean(ValueParams.TRIM)) {
+				ret = ret.trim();
+			}
+			Integer min = params.getParamAsInt(ValueParams.MIN);
+			if(min != null) {
+				ret = String.format(String.format("%%-%ds", min), ret);
+			}
+			return ret;
 		}
 		return null;
+	}
+
+	@Override
+	public String format(Object data) {
+		if(data instanceof String) {
+			return (String)data;
+		}
+		throw new IllegalArgumentException();
 	}
 }

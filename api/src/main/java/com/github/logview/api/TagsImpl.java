@@ -18,7 +18,7 @@ public class TagsImpl implements Tags {
 				@Override
 				public Match load(String tag) throws Exception {
 					System.err.printf("new tag: %s:%s\n", prefix, tag);
-					return new Match(tag);
+					return new Match(factory, tag, tag);
 				}
 			});
 

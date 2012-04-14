@@ -4,6 +4,7 @@ SESSIONHOST
 SESSIONHOST uppercase:true
 SESSION
 SESSION uppercase:true
+DATE format:HH:mm:ss,SSS
 UUID
 UUID uppercase:true
 DOUBLE

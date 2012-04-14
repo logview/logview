@@ -1,5 +1,6 @@
 package com.github.logview.value.api;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.junit.Assert;
@@ -59,6 +60,21 @@ public class ValueFactoryValueOfTest {
 		result = subject.valueOf("-123451234512345");
 		Assert.assertTrue(result instanceof Long);
 		Assert.assertEquals(-123451234512345L, result);
+	}
+
+	@Test
+	public void testDate() {
+		ValueFactory subject = new ValueFactory();
+		subject.load("DATE format:HH:mm:ss,SSS");
+		testDate(subject);
+		testDate(ValueFactory.getDefault());
+	}
+
+	private void testDate(ValueFactory subject) {
+		String date = "12:34:56,789";
+		Object result = subject.valueOf(date);
+		Assert.assertTrue(result instanceof Date);
+		Assert.assertEquals(new Date(45296789), result);
 	}
 
 	@Test
