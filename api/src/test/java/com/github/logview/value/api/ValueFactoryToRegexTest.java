@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ValueFactoryToRegexTest {
-	private final ValueFactory subject = ValueFactory.getDefault();
+	private final ValueFactory subject = ValueFactory.createDefault();
 
 	private void testSame(String expected, String string) {
 		Assert.assertEquals(expected, subject.toRegex(string));

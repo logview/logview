@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.github.logview.matcher.Match;
 
 public class RegexValueTest {
-	private final ValueFactory subject = ValueFactory.getDefault();
+	private final ValueFactory subject = ValueFactory.createDefault();
 
 	@Test
 	public void testDouble() {

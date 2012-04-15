@@ -19,11 +19,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public final class ValueFactory implements ValueOf, ValueAnalyser {
+	private final static LoadingCache<String, Pattern> compileCache = CacheBuilder.newBuilder().weakValues()
+			.build(new CacheLoader<String, Pattern>() {
+				@Override
+				public Pattern load(String regex) throws Exception {
+					return Pattern.compile(regex);
+				}
+			});
+
 	private final LoadingCache<String, Pattern> patternCache = CacheBuilder.newBuilder().weakValues()
 			.build(new CacheLoader<String, Pattern>() {
 				@Override
 				public Pattern load(String regex) throws Exception {
-					return Pattern.compile(toRegex(regex));
+					return compileCache.get(toRegex(regex));
 				}
 			});
 
@@ -38,8 +46,15 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		instance.loadDefaults();
 	}
 
-	public static ValueFactory getDefault() {
-		return instance;
+	public static ValueFactory createDefault() {
+		return new ValueFactory(instance);
+	}
+
+	public ValueFactory() {
+	}
+
+	private ValueFactory(ValueFactory copy) {
+		types.putAll(copy.types);
 	}
 
 	public void loadDefaults() {

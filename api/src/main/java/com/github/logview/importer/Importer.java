@@ -1,17 +1,18 @@
-package com.github.logview.api;
+package com.github.logview.importer;
 
 import java.io.File;
-import java.util.List;
 import java.util.Scanner;
 import java.util.prefs.Preferences;
 
-import com.github.logview.matcher.Match;
+import com.github.logview.api.Appender;
+import com.github.logview.api.Loader;
+import com.github.logview.api.LogFile;
+import com.github.logview.io.Writer;
 import com.github.logview.matcher.Matcher;
 import com.github.logview.matcher.ValueMatcher;
 import com.github.logview.util.AutomaticScanner;
 import com.github.logview.util.Util;
 import com.github.logview.value.api.ValueFactory;
-import com.google.common.collect.Lists;
 
 public class Importer {
 	public static void load(ValueFactory factory, String prefix, Loader loader) throws Exception {
@@ -43,34 +44,37 @@ public class Importer {
 	public static void loadLog(Matcher parser, File file, Appender appender, LogFile logfile) throws Exception {
 		Scanner scanner = AutomaticScanner.create(file);
 
+		final long start = System.currentTimeMillis();
+		MultiThreadImporter mti = new MultiThreadImporter(parser, appender, logfile);
+		Writer<String> writer = mti.getWriter();
 		try {
-			final long a = System.currentTimeMillis();
+			long id = 0;
+			/*
 			long bytes = 0;
-			Match last = null;
-			List<String> lines = Lists.newLinkedList();
+			long mb = 0, lastmb = 0;
+			*/
 			while(scanner.hasNextLine()) {
-				String line = scanner.nextLine();
+				final String line = scanner.nextLine();
+				/*
 				bytes += line.length();
-				if(bytes >= 1024 * 1024 * 10) {
+				if(bytes >= 1024 * 1024 * 1024) {
 					break;
 				}
-				Match match = parser.match(line);
-				if(match != null) {
-					if(last != null) {
-						appender.append(logfile, new Entry(last, lines));
-						lines.clear();
-					}
-					last = match;
-				} else {
-					lines.add(line);
+				*/
+				writer.write(id, line);
+				id++;
+				/*
+				mb = bytes / 1024 / 1024 / 100;
+				if(mb != lastmb) {
+					lastmb = mb;
+					System.err.printf("read %d MB, %6.1fm lines: %s\n", bytes / 1024 / 1024, id / 1000.0 / 1000.0,
+						mti.getStatus());
 				}
-			}
-
-			System.err.printf("%d ms\n", System.currentTimeMillis() - a);
-			if(last != null) {
-				appender.append(logfile, new Entry(last, lines));
+				*/
 			}
 		} finally {
+			System.err.printf("reading: %d ms\n", System.currentTimeMillis() - start);
+			mti.close();
 			scanner.close();
 		}
 	}

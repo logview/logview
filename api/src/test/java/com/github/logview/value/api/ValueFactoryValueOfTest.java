@@ -10,7 +10,7 @@ public class ValueFactoryValueOfTest {
 	@Test
 	public void testNull() {
 		testNull(new ValueFactory());
-		testNull(ValueFactory.getDefault());
+		testNull(ValueFactory.createDefault());
 	}
 
 	private void testNull(ValueFactory subject) {
@@ -23,7 +23,7 @@ public class ValueFactoryValueOfTest {
 		ValueFactory subject = new ValueFactory();
 		subject.load("DOUBLE");
 		testDouble(subject);
-		testDouble(ValueFactory.getDefault());
+		testDouble(ValueFactory.createDefault());
 	}
 
 	private void testDouble(ValueFactory subject) {
@@ -45,7 +45,7 @@ public class ValueFactoryValueOfTest {
 		ValueFactory subject = new ValueFactory();
 		subject.load("LONG");
 		testLong(subject);
-		testLong(ValueFactory.getDefault());
+		testLong(ValueFactory.createDefault());
 	}
 
 	private void testLong(ValueFactory subject) {
@@ -67,7 +67,7 @@ public class ValueFactoryValueOfTest {
 		ValueFactory subject = new ValueFactory();
 		subject.load("DATE format:HH:mm:ss,SSS");
 		testDate(subject);
-		testDate(ValueFactory.getDefault());
+		testDate(ValueFactory.createDefault());
 	}
 
 	private void testDate(ValueFactory subject) {
@@ -82,7 +82,7 @@ public class ValueFactoryValueOfTest {
 		ValueFactory subject = new ValueFactory();
 		subject.load("SESSION");
 		testSession(subject);
-		testSession(ValueFactory.getDefault());
+		testSession(ValueFactory.createDefault());
 	}
 
 	private void testSession(ValueFactory subject) {
@@ -102,7 +102,7 @@ public class ValueFactoryValueOfTest {
 		ValueFactory subject = new ValueFactory();
 		subject.load("SESSIONHOST");
 		testSessionHost(subject);
-		testSessionHost(ValueFactory.getDefault());
+		testSessionHost(ValueFactory.createDefault());
 	}
 
 	private void testSessionHost(ValueFactory subject) {
@@ -123,7 +123,7 @@ public class ValueFactoryValueOfTest {
 		subject.load("BOOLEAN");
 		subject.load("BOOLEAN true:TRUE false:FALSE");
 		testBoolean(subject);
-		testBoolean(ValueFactory.getDefault());
+		testBoolean(ValueFactory.createDefault());
 	}
 
 	private void testBoolean(ValueFactory subject) {
@@ -150,7 +150,7 @@ public class ValueFactoryValueOfTest {
 		subject.load("UUID");
 		subject.load("UUID uppercase:true");
 		testUuid(subject);
-		testUuid(ValueFactory.getDefault());
+		testUuid(ValueFactory.createDefault());
 	}
 
 	private void testUuid(ValueFactory subject) {

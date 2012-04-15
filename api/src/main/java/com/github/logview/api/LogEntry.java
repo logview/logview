@@ -5,11 +5,13 @@ import java.util.List;
 import com.github.logview.matcher.Match;
 import com.google.common.collect.ImmutableList;
 
-public class Entry {
+public class LogEntry {
+	private final long id;
 	private final Match line;
 	private final List<String> lines;
 
-	public Entry(Match line, List<String> lines) {
+	public LogEntry(long id, Match line, List<String> lines) {
+		this.id = id;
 		this.line = line;
 		this.lines = ImmutableList.copyOf(lines);
 	}
@@ -36,5 +38,9 @@ public class Entry {
 			sb.append('\n');
 		}
 		return sb.toString();
+	}
+
+	public long getId() {
+		return id;
 	}
 }
