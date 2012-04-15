@@ -1,10 +1,10 @@
 package com.github.logview.value.type;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.TimeZone;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.github.logview.params.Params;
 import com.github.logview.value.api.ValueParams;
@@ -41,7 +41,7 @@ public class DateValue extends AbstractRegexValue {
 		return ret;
 	}
 
-	private final SimpleDateFormat format;
+	private final DateTimeFormatter format;
 
 	public DateValue(Map<ValueParams, String> data) {
 		this(type.create(data));
@@ -49,8 +49,7 @@ public class DateValue extends AbstractRegexValue {
 
 	private DateValue(Params params) {
 		super(createDateRegex(params.getParamAsString(ValueParams.FORMAT)), params);
-		format = new SimpleDateFormat(params.getParamAsString(ValueParams.FORMAT));
-		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		format = DateTimeFormat.forPattern(params.getParamAsString(ValueParams.FORMAT)).withZoneUTC();
 	}
 
 	@Override
@@ -64,17 +63,13 @@ public class DateValue extends AbstractRegexValue {
 		if(ret == null) {
 			return ret;
 		}
-		try {
-			return format.parseObject(ret);
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
+		return format.parseDateTime(ret).toDate();
 	}
 
 	@Override
 	public String format(Object data) {
 		if(data instanceof Date) {
-			return format.format((Date)data);
+			return format.print(((Date)data).getTime());
 		}
 		throw new IllegalArgumentException();
 	}
