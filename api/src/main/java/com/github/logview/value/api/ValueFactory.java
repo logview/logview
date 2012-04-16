@@ -110,17 +110,22 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		if(string == null) {
 			return null;
 		}
-		String ret = string;
+		String left = string;
+		StringBuilder sb = new StringBuilder();
 		while(true) {
-			Matcher m = token.matcher(ret);
+			Matcher m = token.matcher(left);
 			if(m.find()) {
-				Value type = getType(m.group());
-				ret = m.replaceFirst("(" + Util.escapeReplace(type.getRegex()) + ")");
+				sb.append(Util.escape(left.substring(0, m.start())));
+				left = left.substring(m.end());
+				sb.append('(');
+				sb.append(getType(m.group()).getRegex());
+				sb.append(')');
 				continue;
 			}
 			break;
 		}
-		return ret;
+		sb.append(left);
+		return sb.toString();
 	}
 
 	public Value getType(String type) {

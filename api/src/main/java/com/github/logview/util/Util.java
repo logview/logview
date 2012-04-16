@@ -44,7 +44,7 @@ public class Util {
 	}
 
 	public static String escape(String string) {
-		return string.replaceAll("([\\\\\\$\\^\\.\\(\\)])", "\\\\$1");
+		return string.replaceAll("([\\\\\\$\\^\\.\\(\\)\\-])", "\\\\$1");
 	}
 
 	public static String escapeReplace(String string) {

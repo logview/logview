@@ -1,20 +1,46 @@
 package com.github.logview.value.api;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ValueFactoryToRegexTest {
 	private final ValueFactory subject = ValueFactory.createDefault();
 
+	private void testSame(String string) {
+		testSame(string, string);
+	}
+
 	private void testSame(String expected, String string) {
 		Assert.assertEquals(expected, subject.toRegex(string));
+		if(expected != null) {
+			Pattern p = Pattern.compile(expected);
+			java.util.regex.Matcher m = p.matcher("");
+			Assert.assertFalse(m.find());
+			m.reset();
+			Assert.assertFalse(m.matches());
+		}
 	}
 
 	@Test
 	public void testNull() {
-		testSame(null, null);
-		testSame("", "");
-		testSame("test123...", "test123...");
+		testSame(null);
+		testSame(" ");
+		testSame("test123...");
+	}
+
+	@Test
+	public void testRegex() {
+		testSame("test - test");
+		testSame("test $ test");
+		testSame("test ^ test");
+	}
+
+	@Test(expected = PatternSyntaxException.class)
+	public void testRegexFail() {
+		testSame("test [x-/] test");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -30,7 +56,7 @@ public class ValueFactoryToRegexTest {
 
 	@Test
 	public void testMulti() {
-		testSame("(\\-?\\d+\\.\\d+)-(\\-?\\d+)-(true|false)", "$(DOUBLE)-$(LONG)-$(BOOLEAN)");
+		testSame("(\\-?\\d+\\.\\d+)\\-(\\-?\\d+)\\-(true|false)", "$(DOUBLE)-$(LONG)-$(BOOLEAN)");
 	}
 
 	@Test
