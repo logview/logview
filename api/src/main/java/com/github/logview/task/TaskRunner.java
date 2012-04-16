@@ -8,8 +8,10 @@ public class TaskRunner implements Runnable {
 	private final AtomicBoolean close;
 	private final AtomicInteger count;
 	private final Task task;
+	private final TaskManager taskManager;
 
-	public TaskRunner(int id, AtomicBoolean close, AtomicInteger count, Task task) {
+	public TaskRunner(TaskManager taskManager, int id, AtomicBoolean close, AtomicInteger count, Task task) {
+		this.taskManager = taskManager;
 		this.close = close;
 		this.count = count;
 		this.task = task;
@@ -31,21 +33,21 @@ public class TaskRunner implements Runnable {
 					continue;
 				}
 				if(close.get()) {
-					count.decrementAndGet();
-					synchronized(count) {
-						count.notifyAll();
-					}
 					task.actionFinished();
 					System.err.printf("finished task %s: %d ms\n", name, System.currentTimeMillis() - start);
 					return;
 				}
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
+				Thread.sleep(10);
 			}
+		} catch (Throwable t) {
+			System.err.println("aborted task " + name + " " + t.getMessage());
+			taskManager.abort();
+			throw new RuntimeException(t);
 		} finally {
+			count.decrementAndGet();
+			synchronized(count) {
+				count.notifyAll();
+			}
 			thread.setName(tname);
 		}
 	}

@@ -2,6 +2,7 @@ package com.github.logview.importer;
 
 import java.io.File;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.prefs.Preferences;
 
 import com.github.logview.api.Appender;
@@ -10,6 +11,7 @@ import com.github.logview.api.LogFile;
 import com.github.logview.io.Writer;
 import com.github.logview.matcher.Matcher;
 import com.github.logview.matcher.ValueMatcher;
+import com.github.logview.task.TaskListener;
 import com.github.logview.util.AutomaticScanner;
 import com.github.logview.util.Util;
 import com.github.logview.value.api.ValueFactory;
@@ -26,7 +28,7 @@ public class Importer {
 
 	public static void load(ValueFactory factory, String key, String path, Loader loader) throws Exception {
 		String mach = Util.loadString(Importer.class, "../settings/format.properties", key);
-		Importer.loadPath(new ValueMatcher(factory, mach), path, loader);
+		Importer.loadPath(new ValueMatcher(factory, mach, false), path, loader);
 	}
 
 	public static void loadPath(Matcher parser, String path, Loader loader) throws Exception {
@@ -43,9 +45,16 @@ public class Importer {
 
 	public static void loadLog(Matcher parser, File file, Appender appender, LogFile logfile) throws Exception {
 		Scanner scanner = AutomaticScanner.create(file);
+		final AtomicBoolean aborted = new AtomicBoolean();
 
 		final long start = System.currentTimeMillis();
 		MultiThreadImporter mti = new MultiThreadImporter(parser, appender, logfile);
+		mti.addListener(new TaskListener() {
+			@Override
+			public void notifyAborted() {
+				aborted.set(true);
+			}
+		});
 		Writer<String> writer = mti.getWriter();
 		try {
 			long id = 0;
@@ -53,7 +62,7 @@ public class Importer {
 			long bytes = 0;
 			long mb = 0, lastmb = 0;
 			*/
-			while(scanner.hasNextLine()) {
+			while(scanner.hasNextLine() && !aborted.get()) {
 				final String line = scanner.nextLine();
 				/*
 				bytes += line.length();

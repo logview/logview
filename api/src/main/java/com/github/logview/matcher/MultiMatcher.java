@@ -10,14 +10,14 @@ public class MultiMatcher implements Matcher {
 	private final ValueFactory factory;
 	private final List<Matcher> matchers = Lists.newLinkedList();
 
-	public MultiMatcher(ValueFactory factory, String key, Properties props) {
+	public MultiMatcher(ValueFactory factory, String key, Properties props, boolean escape) {
 		this.factory = factory;
 		for(int i = 0;; i++) {
 			String match = props.getProperty(key + "." + i);
 			if(match == null) {
 				break;
 			}
-			add(match);
+			add(match, escape);
 		}
 	}
 
@@ -34,9 +34,9 @@ public class MultiMatcher implements Matcher {
 		return null;
 	}
 
-	public boolean add(String match) {
+	public boolean add(String match, boolean escape) {
 		synchronized(matchers) {
-			return matchers.add(new ValueMatcher(factory, match));
+			return matchers.add(new ValueMatcher(factory, match, escape));
 		}
 	}
 }

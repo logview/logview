@@ -9,10 +9,10 @@ public class ValueMatcher implements Matcher {
 	private final String match;
 	private final Pattern pattern;
 
-	public ValueMatcher(ValueFactory factory, String match) {
+	public ValueMatcher(ValueFactory factory, String match, boolean escape) {
 		this.factory = factory;
 		this.match = match;
-		pattern = factory.getPattern(match);
+		pattern = factory.getPattern(match, escape);
 	}
 
 	@Override

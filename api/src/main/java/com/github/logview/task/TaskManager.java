@@ -1,6 +1,7 @@
 package com.github.logview.task;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,7 @@ public class TaskManager {
 	private final ArrayList<AtomicBoolean> closed = Lists.newArrayList();
 	private final ArrayList<AtomicInteger> running = Lists.newArrayList();
 	private final ArrayList<Task> tasks = Lists.newArrayList();
+	private final List<TaskListener> listeners = Lists.newLinkedList();
 
 	public TaskManager() {
 		this.es = Executors.newCachedThreadPool();
@@ -23,11 +25,15 @@ public class TaskManager {
 		AtomicBoolean closed = new AtomicBoolean();
 		AtomicInteger running = new AtomicInteger();
 		for(int i = 0; i < count; i++) {
-			es.execute(new TaskRunner(i + 1, closed, running, task));
+			es.execute(new TaskRunner(this, i + 1, closed, running, task));
 		}
 		this.closed.add(closed);
 		this.running.add(running);
 		this.tasks.add(task);
+	}
+
+	public void addListener(TaskListener listener) {
+		listeners.add(listener);
 	}
 
 	public void close() throws InterruptedException {
@@ -70,5 +76,19 @@ public class TaskManager {
 			sb.append('\n');
 		}
 		return sb.toString();
+	}
+
+	public void abort() {
+		try {
+			es.shutdown();
+			for(int i = 0; i < closed.size(); i++) {
+				this.closed.get(i).set(true);
+			}
+			for(TaskListener listener : listeners) {
+				listener.notifyAborted();
+			}
+		} finally {
+			System.err.println("closed TaskManager");
+		}
 	}
 }

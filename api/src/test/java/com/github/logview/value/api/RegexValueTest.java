@@ -11,21 +11,21 @@ public class RegexValueTest {
 	@Test
 	public void testDouble() {
 		String string = "test double:0.0";
-		Match result = subject.parse(subject.analyse(string), string);
+		Match result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Double);
 		Assert.assertEquals(0.0, result.getValue(0));
 
 		string = "test double:123456789.987654321";
-		result = subject.parse(subject.analyse(string), string);
+		result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Double);
 		Assert.assertEquals(123456789.987654321, result.getValue(0));
 
 		string = "test double:-987654321.123456789";
-		result = subject.parse(subject.analyse(string), string);
+		result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Double);
@@ -35,21 +35,21 @@ public class RegexValueTest {
 	@Test
 	public void testLong() {
 		String string = "test long:0";
-		Match result = subject.parse(subject.analyse(string), string);
+		Match result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Long);
 		Assert.assertEquals(0L, result.getValue(0));
 
 		string = "test long:123451234512345";
-		result = subject.parse(subject.analyse(string), string);
+		result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(1L, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Long);
 		Assert.assertEquals(123451234512345L, result.getValue(0));
 
 		string = "test long:-987654321098765";
-		result = subject.parse(subject.analyse(string), string);
+		result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Long);
@@ -59,7 +59,7 @@ public class RegexValueTest {
 	@Test
 	public void testMulti() {
 		String string = "test long:0 double:0.0 boolean:true";
-		Match result = subject.parse(subject.analyse(string), string);
+		Match result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(3, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Long);
@@ -70,7 +70,7 @@ public class RegexValueTest {
 		Assert.assertEquals(true, result.getValue(2));
 
 		string = "test boolean:FALSE boolean:true double:123.456 long:-55555";
-		result = subject.parse(subject.analyse(string), string);
+		result = subject.parse(subject.analyse(string), string, true);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(4, result.size());
 		Assert.assertTrue(result.getValue(0) instanceof Boolean);
@@ -85,6 +85,7 @@ public class RegexValueTest {
 
 	@Test
 	public void testNull() {
-		Assert.assertNull(subject.parse("\\d", "xyz"));
+		Assert.assertNull(subject.parse("\\d", "xyz", true));
+		Assert.assertNull(subject.parse("\\d", "xyz", false));
 	}
 }

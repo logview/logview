@@ -43,6 +43,15 @@ public class EntryJoinerTask extends Task {
 		if(current == null) {
 			current = matches.read();
 			if(current == null) {
+				if(extras.isFull()) {
+					StringBuilder sb = new StringBuilder("extras list is full and no matches found!\nfirst 10 extras:");
+					for(int i = 0; i < 10; i++) {
+						sb.append(String.format("\n%d ", i + 1));
+						sb.append(extras.readValue());
+					}
+					sb.append('\n');
+					throw new RuntimeException(sb.toString());
+				}
 				return false;
 			}
 		}

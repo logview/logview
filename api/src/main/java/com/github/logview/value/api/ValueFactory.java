@@ -31,7 +31,15 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 			.build(new CacheLoader<String, Pattern>() {
 				@Override
 				public Pattern load(String regex) throws Exception {
-					return compileCache.get(toRegex(regex));
+					return compileCache.get(toRegex(regex, false));
+				}
+			});
+
+	private final LoadingCache<String, Pattern> patternCacheEscape = CacheBuilder.newBuilder().weakValues()
+			.build(new CacheLoader<String, Pattern>() {
+				@Override
+				public Pattern load(String regex) throws Exception {
+					return compileCache.get(toRegex(regex, true));
 				}
 			});
 
@@ -106,7 +114,7 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		return ret;
 	}
 
-	public String toRegex(String string) {
+	public String toRegex(String string, boolean escape) {
 		if(string == null) {
 			return null;
 		}
@@ -115,7 +123,11 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		while(true) {
 			Matcher m = token.matcher(left);
 			if(m.find()) {
-				sb.append(Util.escape(left.substring(0, m.start())));
+				if(escape) {
+					sb.append(Util.escape(left.substring(0, m.start())));
+				} else {
+					sb.append(left.substring(0, m.start()));
+				}
 				left = left.substring(m.end());
 				sb.append('(');
 				sb.append(getType(m.group()).getRegex());
@@ -124,7 +136,11 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 			}
 			break;
 		}
-		sb.append(left);
+		if(escape) {
+			sb.append(Util.escape(left));
+		} else {
+			sb.append(left);
+		}
 		return sb.toString();
 	}
 
@@ -155,8 +171,8 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		return string;
 	}
 
-	public Match parse(String match, String string) {
-		return parse(getPattern(match), match, string);
+	public Match parse(String match, String string, boolean escape) {
+		return parse(getPattern(match, escape), match, string);
 	}
 
 	public Match parse(Pattern pattern, String match, String string) {
@@ -175,8 +191,12 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		return null;
 	}
 
-	public Pattern getPattern(String match) {
-		return patternCache.getUnchecked(match);
+	public Pattern getPattern(String match, boolean escape) {
+		if(escape) {
+			return patternCacheEscape.getUnchecked(match);
+		} else {
+			return patternCache.getUnchecked(match);
+		}
 	}
 
 	public void reset() {

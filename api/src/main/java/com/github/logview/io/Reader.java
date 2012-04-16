@@ -8,4 +8,6 @@ public interface Reader<T> {
 	Long firstKey();
 
 	T readValue();
+
+	boolean isFull();
 }

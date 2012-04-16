@@ -13,8 +13,17 @@ public class ValueFactoryToRegexTest {
 		testSame(string, string);
 	}
 
+	private void testSame(String string, boolean escape) {
+		testSame(string, string, escape);
+	}
+
 	private void testSame(String expected, String string) {
-		Assert.assertEquals(expected, subject.toRegex(string));
+		testSame(expected, string, true);
+		testSame(expected, string, false);
+	}
+
+	private void testSame(String expected, String string, boolean escape) {
+		Assert.assertEquals(expected, subject.toRegex(string, escape));
 		if(expected != null) {
 			Pattern p = Pattern.compile(expected);
 			java.util.regex.Matcher m = p.matcher("");
@@ -28,24 +37,35 @@ public class ValueFactoryToRegexTest {
 	public void testNull() {
 		testSame(null);
 		testSame(" ");
-		testSame("test123...");
+		testSame("test123...", false);
+		testSame("test123\\.\\.\\.", "test123...", true);
 	}
 
 	@Test
 	public void testRegex() {
-		testSame("test - test");
-		testSame("test $ test");
-		testSame("test ^ test");
+		testSame("test - test", false);
+		testSame("test \\- test", "test - test", true);
+		testSame("test $ test", false);
+		testSame("test \\$ test", "test $ test", true);
+		testSame("test ^ test", false);
+		testSame("test \\^ test", "test ^ test", true);
+		testSame("test \\ test", false);
+		testSame("test \\\\ test", "test \\ test", true);
 	}
 
 	@Test(expected = PatternSyntaxException.class)
 	public void testRegexFail() {
-		testSame("test [x-/] test");
+		testSame("test [x-/] test", false);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void testTypeNotFound() {
-		subject.toRegex("$(test)");
+	public void testTypeNotFound1() {
+		subject.toRegex("$(test)", true);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testTypeNotFound2() {
+		subject.toRegex("$(test)", false);
 	}
 
 	@Test
@@ -55,8 +75,16 @@ public class ValueFactoryToRegexTest {
 	}
 
 	@Test
-	public void testMulti() {
-		testSame("(\\-?\\d+\\.\\d+)\\-(\\-?\\d+)\\-(true|false)", "$(DOUBLE)-$(LONG)-$(BOOLEAN)");
+	public void testMulti1() {
+		testSame("(\\-?\\d+\\.\\d+)\\-(\\-?\\d+)\\-(true|false)", "$(DOUBLE)-$(LONG)-$(BOOLEAN)", true);
+		testSame("(\\-?\\d+\\.\\d+)-(\\-?\\d+)-(true|false)", "$(DOUBLE)-$(LONG)-$(BOOLEAN)", false);
+	}
+
+	@Test
+	public void testMulti2() {
+		testSame("\\- (\\-?\\d+\\.\\d+) \\- (\\-?\\d+) \\- (true|false) \\-", "- $(DOUBLE) - $(LONG) - $(BOOLEAN) -",
+			true);
+		testSame("- (\\-?\\d+\\.\\d+) - (\\-?\\d+) - (true|false) -", "- $(DOUBLE) - $(LONG) - $(BOOLEAN) -", false);
 	}
 
 	@Test
