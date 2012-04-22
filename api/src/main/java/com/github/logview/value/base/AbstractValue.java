@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import com.github.logview.params.AbstractParams;
 import com.github.logview.params.Params;
+import com.github.logview.util.Util;
 import com.github.logview.value.api.Value;
 import com.github.logview.value.api.ValueParams;
 
@@ -43,16 +44,21 @@ public abstract class AbstractValue extends AbstractParams implements Value {
 			if(!m.find()) {
 				return ret;
 			}
-			ret = m.replaceFirst("$1\\$(" + getType() + getExtra() + ")$3");
+			ret = m.replaceFirst("$1\\$(" + getType() + Util.escape(getExtra()) + ")$3");
 		}
 	}
 
 	public String analyseOneStep(String string) {
 		Matcher m = analyser.matcher(string);
 		if(m.find()) {
-			return m.replaceAll("$1\\$(" + getType() + getExtra() + ")$3");
+			return m.replaceAll("$1\\$(" + getType() + Util.escape(getExtra()) + ")$3");
 		}
 		return string;
+	}
+
+	@Override
+	public boolean isGeneric() {
+		return false;
 	}
 
 	@Override

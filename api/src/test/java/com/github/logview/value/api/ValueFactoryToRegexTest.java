@@ -98,6 +98,12 @@ public class ValueFactoryToRegexTest {
 	}
 
 	@Test
+	public void testDate2() {
+		testSame("(\\w{3} \\w{3} \\d{2} \\d{2}\\:\\d{2}\\:\\d{2} \\w+ \\d\\d\\d\\d)",
+			"$(DATE format:EEE\\_MMM\\_dd\\_HH:mm:ss\\_z\\_yyyy)");
+	}
+
+	@Test
 	public void testBoolean() {
 		testSame("(true|false)", "$(BOOLEAN)");
 		testSame("(TRUE|FALSE)", "$(BOOLEAN true:TRUE false:FALSE)");
@@ -119,5 +125,11 @@ public class ValueFactoryToRegexTest {
 	public void testSessionHost() {
 		testSame("([0-9a-f]{32}\\.[0-9a-z\\-]+)", "$(SESSIONHOST)");
 		testSame("([0-9A-F]{32}\\.[0-9a-z\\-]+)", "$(SESSIONHOST uppercase:true)");
+	}
+
+	@Test
+	public void testQuestionmark() {
+		testSame("test:(\\-?\\d+\\.\\d+)?", "test:$(DOUBLE)?", false);
+		testSame("test:(\\-?\\d+\\.\\d+)\\?", "test:$(DOUBLE)?", true);
 	}
 }

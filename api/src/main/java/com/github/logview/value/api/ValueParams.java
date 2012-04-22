@@ -9,6 +9,9 @@ public enum ValueParams {
 	NAME,
 	TRIM,
 	MIN,
+	TAGS,
+	LOCALE,
+	ZONE,
 	//
 	;
 

@@ -7,18 +7,35 @@ import com.github.logview.value.api.ValueFactory;
 import com.google.common.collect.Lists;
 
 public class MultiMatcher implements Matcher {
-	private final ValueFactory factory;
-	private final List<Matcher> matchers = Lists.newLinkedList();
+	protected final String key;
+	protected final ValueFactory factory;
+	private final List<ValueMatcher> matchers = Lists.newLinkedList();
 
-	public MultiMatcher(ValueFactory factory, String key, Properties props, boolean escape) {
+	public MultiMatcher(ValueFactory factory, String key) {
 		this.factory = factory;
+		this.key = key;
+	}
+
+	public MultiMatcher(ValueFactory factory, String key, Properties props) {
+		this(factory, key);
+		load(key, props);
+	}
+
+	public MultiMatcher(ValueFactory factory, String key, Properties manual, Properties auto) {
+		this(factory, key);
+		load(key, manual);
+		load(key, auto);
+	}
+
+	public MultiMatcher load(String key, Properties props) {
 		for(int i = 0;; i++) {
 			String match = props.getProperty(key + "." + i);
 			if(match == null) {
 				break;
 			}
-			add(match, escape);
+			add(match, true);
 		}
+		return this;
 	}
 
 	@Override

@@ -19,4 +19,8 @@ public class ValueMatcher implements Matcher {
 	public Match match(String line) {
 		return factory.parse(pattern, match, line);
 	}
+
+	public String getMatch() {
+		return match;
+	}
 }

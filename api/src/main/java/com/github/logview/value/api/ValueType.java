@@ -7,6 +7,7 @@ import com.github.logview.params.ParamsDefinition;
 import com.github.logview.value.type.BooleanValue;
 import com.github.logview.value.type.DateValue;
 import com.github.logview.value.type.DoubleValue;
+import com.github.logview.value.type.IpValue;
 import com.github.logview.value.type.LongValue;
 import com.github.logview.value.type.SessionHostValue;
 import com.github.logview.value.type.SessionValue;
@@ -18,8 +19,9 @@ import com.google.common.collect.Maps;
 
 public enum ValueType {
 	BOOLEAN(BooleanValue.class, ValueParamsDefinitions.booleanParams),
-	DATE(DateValue.class, ValueParamsDefinitions.formatParams),
+	DATE(DateValue.class, ValueParamsDefinitions.dateParams),
 	DOUBLE(DoubleValue.class, ValueParamsDefinitions.doubleParams),
+	IP(IpValue.class, ValueParamsDefinitions.emptyParams),
 	LONG(LongValue.class, ValueParamsDefinitions.emptyParams),
 	SESSIONHOST(SessionHostValue.class, ValueParamsDefinitions.uppercaseParams),
 	SESSION(SessionValue.class, ValueParamsDefinitions.uppercaseParams),

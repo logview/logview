@@ -27,4 +27,9 @@ public class WordValue extends AbstractRegexValue {
 	public String analyse(String string) {
 		return analyseOneStep(string);
 	}
+
+	@Override
+	public boolean isGeneric() {
+		return true;
+	}
 }

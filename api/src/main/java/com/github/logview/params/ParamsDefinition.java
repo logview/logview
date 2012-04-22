@@ -39,6 +39,7 @@ public class ParamsDefinition {
 		a.addAll(allowed);
 		a.addAll(required);
 		a.add(ValueParams.NAME);
+		a.add(ValueParams.TAGS);
 		this.allowed = ImmutableSet.copyOf(a);
 		this.required = ImmutableSet.copyOf(required);
 		LinkedHashMap<ValueParams, String> d = Maps.newLinkedHashMap(defaults);

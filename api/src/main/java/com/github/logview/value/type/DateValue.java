@@ -1,12 +1,14 @@
 package com.github.logview.value.type;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.github.logview.params.Params;
+import com.github.logview.util.DateUtil;
 import com.github.logview.value.api.ValueParams;
 import com.github.logview.value.api.ValueType;
 import com.github.logview.value.base.AbstractRegexValue;
@@ -15,7 +17,7 @@ public class DateValue extends AbstractRegexValue {
 	private final static ValueType type = ValueType.DATE;
 
 	private static String replaceDigit2(String d, String ret) {
-		return ret.replaceAll(d + d, "\\\\d{2}").replaceAll(d, "\\\\d{1,2}");
+		return ret.replaceAll(d + d, "\\\\d{2}").replaceAll("[^\\\\]" + d, "\\\\d{1,2}");
 	}
 
 	private static String replaceDigit3(String d, String ret) {
@@ -28,9 +30,12 @@ public class DateValue extends AbstractRegexValue {
 		ret = ret.replaceAll("\\:", "\\\\:");
 		ret = ret.replaceAll("\\(", "\\\\(");
 		ret = ret.replaceAll("\\)", "\\\\)");
+		ret = ret.replaceAll("z", "\\\\w+");
 		ret = ret.replaceAll("y", "\\\\d");
 		ret = ret.replaceAll("MMMM", "\\\\w+");
 		ret = ret.replaceAll("MMM", "\\\\w{3}");
+		ret = ret.replaceAll("EEEE", "\\\\w+");
+		ret = ret.replaceAll("EEE", "\\\\w{3}");
 		ret = replaceDigit2("M", ret);
 		ret = replaceDigit2("d", ret);
 		ret = replaceDigit2("h", ret);
@@ -49,7 +54,13 @@ public class DateValue extends AbstractRegexValue {
 
 	private DateValue(Params params) {
 		super(createDateRegex(params.getParamAsString(ValueParams.FORMAT)), params);
-		format = DateTimeFormat.forPattern(params.getParamAsString(ValueParams.FORMAT)).withZoneUTC();
+		format = DateUtil.withZone(DateTimeFormat.forPattern(params.getParamAsString(ValueParams.FORMAT)),
+			params.getParamAsStringOrNull(ValueParams.ZONE)).withLocale(
+			getLocale(params.getParamAsString(ValueParams.LOCALE)));
+	}
+
+	private Locale getLocale(String language) {
+		return new Locale(language);
 	}
 
 	@Override
@@ -63,7 +74,7 @@ public class DateValue extends AbstractRegexValue {
 		if(ret == null) {
 			return ret;
 		}
-		return format.parseDateTime(ret).toDate();
+		return new Date(DateUtil.parse(format, ret));
 	}
 
 	@Override

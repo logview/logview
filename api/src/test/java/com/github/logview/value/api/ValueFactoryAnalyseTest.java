@@ -18,7 +18,8 @@ public class ValueFactoryAnalyseTest {
 	private static final String TYPE_D1 = "DOUBLE";
 	private static final String TYPE_D2 = "DOUBLE dot:false";
 	private static final String TYPE_L = "LONG";
-	private static final String TYPE_T = "DATE format:HH:mm:ss,SSS";
+	private static final String TYPE_T1 = "DATE format:HH:mm:ss,SSS zone:UTC";
+	private static final String TYPE_T2 = "DATE format:EEE\\_MMM\\_dd\\_HH:mm:ss\\_z\\_yyyy";
 	private static final String TYPE_W = "WORD";
 	private static final String TYPE_S = "STRING";
 
@@ -61,24 +62,29 @@ public class ValueFactoryAnalyseTest {
 	}
 
 	@Test
-	public void testDate() {
-		testSame(TYPE_T, "test date:$(" + TYPE_T + ")", "test date:12:34:56,789");
+	public void testDate1() {
+		testSame(TYPE_T1, "test date:$(" + TYPE_T1 + ")", "test date:12:34:56,789");
+	}
+
+	@Test
+	public void testDate2() {
+		testSame(TYPE_T2, "timestamp=$(" + TYPE_T2 + ")", "timestamp=Fri Jan 01 12:34:56 CEST 2010");
 	}
 
 	@Test
 	public void testWord() {
-		testSame(TYPE_W, "$(" + TYPE_W + ")", "word", "word");
-		testSame(TYPE_W, "$(" + TYPE_W + ") ", "word ", "word ");
-		testSame(TYPE_W, " $(" + TYPE_W + ")", " word", " word");
-		testSame(TYPE_W, " $(" + TYPE_W + ") ", " word ", " word ");
+		testSame(TYPE_W, "word", "word");
+		testSame(TYPE_W, "word ", "word ");
+		testSame(TYPE_W, " word", " word");
+		testSame(TYPE_W, " word ", " word ");
 	}
 
 	@Test
 	public void testString() {
-		testSame(TYPE_S, "$(" + TYPE_S + ")", "test string", "test string");
-		testSame(TYPE_S, "$(" + TYPE_S + ") ", "test string ", "test string ");
-		testSame(TYPE_S, " $(" + TYPE_S + ")", " test string", " test string");
-		testSame(TYPE_S, " $(" + TYPE_S + ") ", " test string ", " test string ");
+		testSame(TYPE_S, "test string", "test string");
+		testSame(TYPE_S, "test string ", "test string ");
+		testSame(TYPE_S, " test string", " test string");
+		testSame(TYPE_S, " test string ", " test string ");
 	}
 
 	@Test
@@ -150,5 +156,10 @@ public class ValueFactoryAnalyseTest {
 		testSame(TYPE_H1, "0123456789abcdef0123456789ABCDEF.ip.-192-168-0-1",
 			"0123456789abcdef0123456789ABCDEF.ip.$(LONG)$(LONG)$(LONG)$(LONG)",
 			"0123456789abcdef0123456789ABCDEF.ip.-192-168-0-1");
+	}
+
+	@Test
+	public void testQuestionmark() {
+		testSame(TYPE_D1, "test:$(DOUBLE)?", "test:1.0?");
 	}
 }

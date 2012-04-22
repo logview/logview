@@ -8,4 +8,6 @@ public interface Value extends ValueOf, ValueAnalyser, ValueFormatter, Params {
 	String getRegex();
 
 	String getExtra();
+
+	boolean isGeneric();
 }

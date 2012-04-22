@@ -10,15 +10,12 @@ import com.github.logview.value.base.AbstractRegexValue;
 public class DoubleValue extends AbstractRegexValue {
 	private final static ValueType type = ValueType.DOUBLE;
 
-	private final boolean dot;
-
 	public DoubleValue(Map<ValueParams, String> data) {
 		this(type.create(data));
 	}
 
 	private DoubleValue(Params params) {
 		super("(\\-?)(\\d+)" + (params.getParamAsBoolean(ValueParams.DOT) ? "\\." : ",") + "(\\d+)", params);
-		this.dot = params.getParamAsBoolean(ValueParams.DOT);
 	}
 
 	@Override
@@ -33,14 +30,6 @@ public class DoubleValue extends AbstractRegexValue {
 			return Double.valueOf(String.format("%s%s.%s", match[1], match[2], match[3]));
 		}
 		return null;
-	}
-
-	@Override
-	public String getExtra() {
-		if(dot) {
-			return "";
-		}
-		return " dot:false";
 	}
 
 	@Override

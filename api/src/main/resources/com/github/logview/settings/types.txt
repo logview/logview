@@ -4,9 +4,11 @@ SESSIONHOST
 SESSIONHOST uppercase:true
 SESSION
 SESSION uppercase:true
-DATE format:HH:mm:ss,SSS
+DATE format:EEE\_MMM\_dd\_HH:mm:ss\_z\_yyyy
+DATE format:HH:mm:ss,SSS zone:UTC
 UUID
 UUID uppercase:true
+IP
 DOUBLE
 DOUBLE dot:false
 LONG

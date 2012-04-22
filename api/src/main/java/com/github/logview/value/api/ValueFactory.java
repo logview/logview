@@ -3,9 +3,10 @@ package com.github.logview.value.api;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +44,8 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 				}
 			});
 
-	private final Map<String, Value> types = Maps.newLinkedHashMap();
+	private final AtomicReference<Map<String, Value>> types = new AtomicReference<Map<String, Value>>(
+			new LinkedHashMap<String, Value>());
 
 	private final static Pattern token = Pattern.compile("\\$\\(([^\\)]*?)\\)");
 
@@ -62,7 +64,7 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 	}
 
 	private ValueFactory(ValueFactory copy) {
-		types.putAll(copy.types);
+		types.get().putAll(copy.types.get());
 	}
 
 	public void loadDefaults() {
@@ -97,19 +99,26 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 				data.put(ValueParams.valueOf(kv[0].toUpperCase()), Util.unescapeSpace(kv[1]));
 			}
 		}
+		Value value;
 		try {
-			types.put(type, clazz.getConstructor(Map.class).newInstance(ImmutableMap.copyOf(data)));
+			value = clazz.getConstructor(Map.class).newInstance(ImmutableMap.copyOf(data));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+		synchronized(types) {
+			Map<String, Value> tmp = Maps.newLinkedHashMap(types.get());
+			tmp.put(type, value);
+			types.set(tmp);
 		}
 	}
 
 	@Override
 	public String analyse(String string) {
 		String ret = string;
-		for(Entry<String, Value> entry : types.entrySet()) {
-			// do not use types.values(), wrong order!
-			ret = entry.getValue().analyse(ret);
+		for(Value entry : types.get().values()) {
+			if(!entry.isGeneric()) {
+				ret = entry.analyse(ret);
+			}
 		}
 		return ret;
 	}
@@ -149,11 +158,11 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		if(t.startsWith("$(") && t.endsWith(")")) {
 			t = t.substring(2, t.length() - 1);
 		}
-		Value ret = types.get(t);
+		Value ret = types.get().get(t);
 		if(ret == null) {
 			load(t);
 		}
-		ret = types.get(t);
+		ret = types.get().get(t);
 		if(ret == null) {
 			throw new IllegalArgumentException("Type '" + t + "' not found!");
 		}
@@ -162,7 +171,7 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 
 	@Override
 	public Object valueOf(String string) {
-		for(Value type : types.values()) {
+		for(Value type : types.get().values()) {
 			Object ret = type.valueOf(string);
 			if(ret != null) {
 				return ret;
@@ -200,7 +209,9 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 	}
 
 	public void reset() {
-		types.clear();
+		synchronized(types) {
+			types.set(new LinkedHashMap<String, Value>());
+		}
 	}
 
 	public String toString(String match, List<Object> data) {

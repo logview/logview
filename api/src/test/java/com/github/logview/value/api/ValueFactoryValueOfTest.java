@@ -65,7 +65,7 @@ public class ValueFactoryValueOfTest {
 	@Test
 	public void testDate() {
 		ValueFactory subject = new ValueFactory();
-		subject.load("DATE format:HH:mm:ss,SSS");
+		subject.load("DATE format:HH:mm:ss,SSS zone:UTC");
 		testDate(subject);
 		testDate(ValueFactory.createDefault());
 	}

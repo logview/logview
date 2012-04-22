@@ -19,8 +19,10 @@ public interface ValueParamsDefinitions {
 	final static ParamsDefinition doubleParams = new ParamsDefinition(ImmutableMap.of( //
 		ValueParams.DOT, ValueValues.TRUE));
 
-	final static ParamsDefinition formatParams = new ParamsDefinition(ImmutableSet.of( //
-			ValueParams.FORMAT));
+	final static ParamsDefinition dateParams = new ParamsDefinition(ImmutableMap.of( //
+		ValueParams.LOCALE, ValueValues.DEFAULT_LOCALE), //
+			ImmutableSet.of(ValueParams.ZONE), //
+			ImmutableSet.of(ValueParams.FORMAT));
 
 	final static ParamsDefinition stringParams = new ParamsDefinition(ImmutableMap.of( //
 		ValueParams.FORMAT, ValueValues.FORMAT_STRING, //

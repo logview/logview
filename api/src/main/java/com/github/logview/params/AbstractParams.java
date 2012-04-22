@@ -1,5 +1,6 @@
 package com.github.logview.params;
 
+import com.github.logview.util.Util;
 import com.github.logview.value.api.ValueParams;
 
 public abstract class AbstractParams implements Params {
@@ -39,7 +40,7 @@ public abstract class AbstractParams implements Params {
 			sb.append(' ');
 			sb.append(key);
 			sb.append(':');
-			sb.append(getParamAsString(key));
+			sb.append(Util.escapeSpace(getParamAsString(key)));
 		}
 		return sb.toString();
 	}

@@ -33,11 +33,6 @@ public class LongValue extends AbstractRegexValue {
 	}
 
 	@Override
-	public String getExtra() {
-		return "";
-	}
-
-	@Override
 	public String format(Object data) {
 		if(data instanceof Long) {
 			return Long.toString((Long)data);

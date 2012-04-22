@@ -10,7 +10,7 @@ import java.util.zip.GZIPInputStream;
 public class AutomaticScanner {
 	public static Scanner create(File file) throws IOException {
 		if(file.getName().endsWith(".gz")) {
-			return new Scanner(new GZIPInputStream(new FileInputStream(file)));
+			return new Scanner(new GZIPInputStream(new FileInputStream(file)), "UTF-8");
 		} else {
 			return new Scanner(new FileReader(file));
 		}
