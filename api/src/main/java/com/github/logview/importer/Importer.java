@@ -70,7 +70,7 @@ public class Importer {
 					break;
 				}
 				*/
-				writer.write(id, line);
+				writer.write(id, line.trim());
 				id++;
 				/*
 				mb = bytes / 1024 / 1024 / 100;

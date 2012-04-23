@@ -31,10 +31,13 @@ public class DateUtil {
 
 	public static DateTimeFormatter withZone(DateTimeFormatter format, String zone) {
 		if(zone == null) {
-			return format;
+			return format.withZoneUTC();
 		}
 
 		DateTimeZone ret = zones.get(zone);
+		if(ret == null) {
+			ret = DateTimeZone.forID(zone);
+		}
 		if(ret == null) {
 			throw new IllegalArgumentException("DateTimeZone '" + zone + "' not supported!");
 		}
