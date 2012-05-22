@@ -4,17 +4,17 @@ import java.util.Map.Entry;
 
 import com.github.logview.io.Reader;
 import com.github.logview.io.Writer;
+import com.github.logview.matcher.LineMatcher;
 import com.github.logview.matcher.Match;
-import com.github.logview.matcher.Matcher;
-import com.github.logview.task.Task;
+import com.github.logview.task.AbstractTask;
 
-public class MatcherTask extends Task {
+public class MatcherTask extends AbstractTask {
 	private final Reader<String> input;
 	private final Writer<String> output;
 	private final Writer<Match> matches;
-	private final Matcher matcher;
+	private final LineMatcher matcher;
 
-	public MatcherTask(Reader<String> input, Writer<Match> matches, Writer<String> output, Matcher matcher) {
+	public MatcherTask(Reader<String> input, Writer<Match> matches, Writer<String> output, LineMatcher matcher) {
 		this.input = input;
 		this.matches = matches;
 		this.output = output;
@@ -22,7 +22,7 @@ public class MatcherTask extends Task {
 	}
 
 	@Override
-	protected boolean actionDo() {
+	public boolean actionDo() {
 		while(true) {
 			Entry<Long, String> entity = input.read();
 			if(entity == null) {

@@ -88,6 +88,23 @@ public class ValueFactoryToRegexTest {
 	}
 
 	@Test
+	public void testException() {
+		testSame("([\\w+\\.]+\\.\\w*[Exception|Error|Throwable])", "$(EXCEPTION)");
+	}
+
+	@Test
+	public void testWord() {
+		testSame("(\\s?\\S.*?\\S\\s?)", "$(WORD)");
+		testSame("(.{5})", "$(WORD name:level min:5 format:.{5})");
+	}
+
+	@Test
+	public void testString() {
+		testSame("(\\s?\\S.*\\s?)", "$(STRING)");
+		testSame("(.{5})", "$(STRING name:level min:5 format:.{5})");
+	}
+
+	@Test
 	public void testLong() {
 		testSame("(\\-?\\d+)", "$(LONG)");
 	}

@@ -1,18 +1,15 @@
 package com.github.logview.task;
 
-public abstract class Task {
+public interface Task {
+	boolean isStarted();
 
-	abstract protected boolean actionDo();
+	boolean actionDo();
 
-	protected void actionStart() {
-	}
+	void actionStart();
 
-	protected void actionFinished() {
-	}
+	void actionFinished();
 
-	public int getMaxThreads() {
-		return 0;
-	}
+	int getMaxThreads();
 
-	abstract public String getName();
+	String getName();
 }

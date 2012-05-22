@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.logview.value.api.ValueParams;
+import com.github.logview.value.api.ValueParamsDefinitions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -38,12 +39,17 @@ public class ParamsDefinition {
 		a.addAll(defaults.keySet());
 		a.addAll(allowed);
 		a.addAll(required);
-		a.add(ValueParams.NAME);
-		a.add(ValueParams.TAGS);
+		a.addAll(ValueParamsDefinitions.globalParams);
 		this.allowed = ImmutableSet.copyOf(a);
 		this.required = ImmutableSet.copyOf(required);
 		LinkedHashMap<ValueParams, String> d = Maps.newLinkedHashMap(defaults);
 		d.put(ValueParams.TRIM, "true");
+		if(d.get(ValueParams.ANALYSE) == null) {
+			d.put(ValueParams.ANALYSE, "true");
+		}
+		if(d.get(ValueParams.INLINE) == null) {
+			d.put(ValueParams.INLINE, "false");
+		}
 		this.defaults = ImmutableMap.copyOf(d);
 	}
 

@@ -3,21 +3,24 @@ package com.github.logview.stringtable;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.github.logview.store.Store;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-public class StringTableDebugImpl extends StringTable {
+public class StringTableDebugImpl implements StringTable {
 	private final BiMap<Integer, String> strings = HashBiMap.create();
 	private final BiMap<String, Integer> inverse = strings.inverse();
 
 	@Override
 	public int addString(String string) {
-		Integer ret = inverse.get(string);
-		if(ret == null) {
-			ret = string.hashCode();
-			strings.put(ret, string);
+		synchronized(strings) {
+			Integer ret = inverse.get(string);
+			if(ret == null) {
+				ret = string.hashCode();
+				strings.put(ret, string);
+			}
+			return ret;
 		}
-		return ret;
 	}
 
 	@Override
@@ -30,7 +33,9 @@ public class StringTableDebugImpl extends StringTable {
 
 	@Override
 	public String getString(int id) {
-		return strings.get(id);
+		synchronized(strings) {
+			return strings.get(id);
+		}
 	}
 
 	@Override
@@ -38,13 +43,28 @@ public class StringTableDebugImpl extends StringTable {
 	}
 
 	public Set<String> getStrings() {
-		return strings.values();
+		synchronized(strings) {
+			return strings.values();
+		}
 	}
 
 	@Override
 	public void listStrings() {
-		for(Entry<Integer, String> key : strings.entrySet()) {
-			System.err.printf("%d: '%s'\n", key.getKey(), key.getValue());
+		synchronized(strings) {
+			for(Entry<Integer, String> key : strings.entrySet()) {
+				System.err.printf("%d: '%s'\n", key.getKey(), key.getValue());
+			}
+		}
+	}
+
+	@Override
+	public void store(Store store) {
+		synchronized(strings) {
+			store.storeInteger(strings.size());
+			for(Entry<Integer, String> key : strings.entrySet()) {
+				store.storeInteger(key.getKey());
+				store.storeString(key.getValue());
+			}
 		}
 	}
 }

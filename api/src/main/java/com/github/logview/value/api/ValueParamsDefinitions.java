@@ -1,10 +1,19 @@
 package com.github.logview.value.api;
 
+import java.util.Set;
+
 import com.github.logview.params.ParamsDefinition;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public interface ValueParamsDefinitions {
+	final static Set<ValueParams> globalParams = ImmutableSet.of( //
+		ValueParams.NAME, //
+		ValueParams.TAGS, //
+		ValueParams.ANALYSE, //
+		ValueParams.INLINE, //
+		ValueParams.TO);
+
 	final static ImmutableSet<ValueParams> emptyValueParams = ImmutableSet.of();
 
 	final static ParamsDefinition emptyParams = new ParamsDefinition();
@@ -26,11 +35,7 @@ public interface ValueParamsDefinitions {
 
 	final static ParamsDefinition stringParams = new ParamsDefinition(ImmutableMap.of( //
 		ValueParams.FORMAT, ValueValues.FORMAT_STRING, //
-		ValueParams.TRIM, ValueValues.TRUE), //
-			ImmutableSet.of(ValueParams.MIN), emptyValueParams);
-
-	final static ParamsDefinition wordParams = new ParamsDefinition(ImmutableMap.of( //
-		ValueParams.FORMAT, ValueValues.FORMAT_WORD, //
+		ValueParams.ANALYSE, ValueValues.FALSE, //
 		ValueParams.TRIM, ValueValues.TRUE), //
 			ImmutableSet.of(ValueParams.MIN), emptyValueParams);
 }

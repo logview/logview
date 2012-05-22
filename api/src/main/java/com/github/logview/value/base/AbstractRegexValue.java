@@ -36,7 +36,7 @@ public abstract class AbstractRegexValue extends AbstractValue {
 		if(match != null) {
 			String ret = match[0];
 			if(params.getParamAsBoolean(ValueParams.TRIM)) {
-				ret = ret.trim();
+				ret = Util.trimRight(ret);
 			}
 			Integer min = params.getParamAsInt(ValueParams.MIN);
 			if(min != null) {
@@ -52,6 +52,6 @@ public abstract class AbstractRegexValue extends AbstractValue {
 		if(data instanceof String) {
 			return (String)data;
 		}
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException(data.getClass().getName());
 	}
 }

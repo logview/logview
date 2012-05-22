@@ -12,6 +12,9 @@ public enum ValueParams {
 	TAGS,
 	LOCALE,
 	ZONE,
+	ANALYSE,
+	INLINE,
+	TO,
 	//
 	;
 

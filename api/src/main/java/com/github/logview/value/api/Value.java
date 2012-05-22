@@ -9,5 +9,5 @@ public interface Value extends ValueOf, ValueAnalyser, ValueFormatter, Params {
 
 	String getExtra();
 
-	boolean isGeneric();
+	boolean useForAnalyse();
 }

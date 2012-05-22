@@ -13,7 +13,6 @@ import com.github.logview.value.type.SessionHostValue;
 import com.github.logview.value.type.SessionValue;
 import com.github.logview.value.type.StringValue;
 import com.github.logview.value.type.UuidValue;
-import com.github.logview.value.type.WordValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
@@ -27,7 +26,6 @@ public enum ValueType {
 	SESSION(SessionValue.class, ValueParamsDefinitions.uppercaseParams),
 	STRING(StringValue.class, ValueParamsDefinitions.stringParams),
 	UUID(UuidValue.class, ValueParamsDefinitions.uppercaseParams),
-	WORD(WordValue.class, ValueParamsDefinitions.wordParams),
 	//
 	;
 

@@ -3,9 +3,9 @@ package com.github.logview.importer;
 import com.github.logview.io.Reader;
 import com.github.logview.io.Writer;
 import com.github.logview.matcher.Match;
-import com.github.logview.task.Task;
+import com.github.logview.task.AbstractTask;
 
-public class EntryOrdererTask extends Task {
+public class EntryOrdererTask extends AbstractTask {
 	private final Reader<Match> matchesIn;
 	private final Reader<String> extraIn;
 	private final Writer<Match> matchesOut;
@@ -21,7 +21,7 @@ public class EntryOrdererTask extends Task {
 	}
 
 	@Override
-	protected boolean actionDo() {
+	public boolean actionDo() {
 		while(true) {
 			Long a = matchesIn.firstKey();
 			if(a != null) {

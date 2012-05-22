@@ -1,7 +1,9 @@
 package com.github.logview.api;
 
-import java.io.File;
+import com.github.logview.importer.Importer;
 
-public interface Loader extends Appender {
-	LogFile load(File file, long date);
+public interface Loader extends Importer {
+	void load();
+
+	void close();
 }

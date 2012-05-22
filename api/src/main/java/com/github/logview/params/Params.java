@@ -1,5 +1,6 @@
 package com.github.logview.params;
 
+import java.util.List;
 import java.util.Set;
 
 import com.github.logview.value.api.ValueParams;
@@ -16,4 +17,6 @@ public interface Params {
 	String getParamsAsString();
 
 	Set<ValueParams> getParams();
+
+	List<String> getParamAsList(ValueParams key);
 }

@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.github.logview.store.Store;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -18,6 +21,21 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 public class Util {
+	private final static String T(String t) {
+		return "(" + t + "|\\(" + t + "\\))*";
+	}
+
+	private final static String T_0 = "[^\\(\\)]*";
+	private final static String T_1 = T(T_0);
+	private final static String T_2 = T(T_1);
+	private final static String T_3 = T(T_2);
+	private final static String TOKEN = "\\$\\((" + T_3 + ")\\)";
+	private final static Pattern token = Pattern.compile(TOKEN);
+
+	public static Matcher matchToken(String input) {
+		return token.matcher(input);
+	}
+
 	public static Properties loadProps(Class<?> clazz, String resource) throws IOException {
 		Properties props = new Properties();
 		InputStream stream = clazz.getResourceAsStream(resource);
@@ -40,6 +58,14 @@ public class Util {
 		data.writeByte(strings.length);
 		for(int i = 0; i < strings.length; i++) {
 			data.writeUTF(strings[i]);
+		}
+	}
+
+	public static void storeStrings(Store store, List<String> strings) {
+//		System.err.println("storeStrings");
+		store.storeLong(strings.size());
+		for(String s : strings) {
+			store.storeString(s);
 		}
 	}
 
@@ -111,5 +137,23 @@ public class Util {
 		ret = ret.replaceAll("\\\\[sS][\\+\\*]?\\??", " ");
 		ret = ret.replaceAll("\\\\(.)", "$1");
 		return ret;
+	}
+
+	public static String trimLeft(String string) {
+		char[] v = string.toCharArray();
+		int from = 0;
+		while((from < v.length) && (v[from] <= ' ')) {
+			from++;
+		}
+		return string.substring(from);
+	}
+
+	public static String trimRight(String string) {
+		char[] v = string.toCharArray();
+		int to = v.length;
+		while((to > 0) && (v[to - 1] <= ' ')) {
+			to--;
+		}
+		return string.substring(0, to);
 	}
 }

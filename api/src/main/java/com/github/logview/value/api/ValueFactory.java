@@ -2,56 +2,33 @@ package com.github.logview.value.api;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.logview.matcher.Match;
+import com.github.logview.matcher.PatternMatcher;
 import com.github.logview.util.Util;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.logview.value.cache.PatternCache;
+import com.github.logview.value.cache.PatternMatcherCache;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public final class ValueFactory implements ValueOf, ValueAnalyser {
-	private final static LoadingCache<String, Pattern> compileCache = CacheBuilder.newBuilder().weakValues()
-			.build(new CacheLoader<String, Pattern>() {
-				@Override
-				public Pattern load(String regex) throws Exception {
-					return Pattern.compile(regex);
-				}
-			});
-
-	private final LoadingCache<String, Pattern> patternCache = CacheBuilder.newBuilder().weakValues()
-			.build(new CacheLoader<String, Pattern>() {
-				@Override
-				public Pattern load(String regex) throws Exception {
-					return compileCache.get(toRegex(regex, false));
-				}
-			});
-
-	private final LoadingCache<String, Pattern> patternCacheEscape = CacheBuilder.newBuilder().weakValues()
-			.build(new CacheLoader<String, Pattern>() {
-				@Override
-				public Pattern load(String regex) throws Exception {
-					return compileCache.get(toRegex(regex, true));
-				}
-			});
-
 	private final AtomicReference<Map<String, Value>> types = new AtomicReference<Map<String, Value>>(
 			new LinkedHashMap<String, Value>());
 
-	private final static Pattern token = Pattern.compile("\\$\\(([^\\)]*?)\\)");
-
 	private final static ValueFactory instance;
+	private final static Map<String, String> aliase = Maps.newHashMap();
 
 	static {
+		try {
+			aliase.putAll(Util.loadMap(ValueFactory.class, "../../settings/alias.properties"));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		instance = new ValueFactory();
 		instance.loadDefaults();
 	}
@@ -59,6 +36,9 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 	public static ValueFactory createDefault() {
 		return new ValueFactory(instance);
 	}
+
+	private final PatternCache patternCache = new PatternCache(this);
+	private final PatternMatcherCache patternMatcherCache = new PatternMatcherCache(this);
 
 	public ValueFactory() {
 	}
@@ -85,8 +65,33 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		}
 	}
 
+	public String alias(String string) {
+		String[] t = string.split(" ", 2);
+		String alias;
+		synchronized(aliase) {
+			alias = aliase.get(t[0]);
+		}
+		if(alias == null) {
+			return string;
+		}
+		String[] a = alias.split(" ", 2);
+		StringBuilder sb = new StringBuilder();
+		sb.append(a[0]);
+		sb.append(" analyse:true");
+		if(a.length == 2) {
+			sb.append(' ');
+			sb.append(a[1]);
+		}
+		if(t.length == 2) {
+			sb.append(' ');
+			sb.append(t[1]);
+		}
+		return sb.toString();
+	}
+
 	public void load(String type) {
-		String[] t = type.split(" ");
+		String alias = alias(type);
+		String[] t = alias.split(" ");
 		ValueType vt = ValueType.valueOf(t[0]);
 		Class<? extends Value> clazz = vt.getValueClass();
 		Map<ValueParams, String> data = Maps.newLinkedHashMap();
@@ -116,7 +121,7 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 	public String analyse(String string) {
 		String ret = string;
 		for(Value entry : types.get().values()) {
-			if(!entry.isGeneric()) {
+			if(entry.useForAnalyse()) {
 				ret = entry.analyse(ret);
 			}
 		}
@@ -130,7 +135,7 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		String left = string;
 		StringBuilder sb = new StringBuilder();
 		while(true) {
-			Matcher m = token.matcher(left);
+			Matcher m = Util.matchToken(left);
 			if(m.find()) {
 				if(escape) {
 					sb.append(Util.escape(left.substring(0, m.start())));
@@ -181,31 +186,23 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 	}
 
 	public Match parse(String match, String string, boolean escape) {
-		return parse(getPattern(match, escape), match, string);
+		// TODO REMOVE
+		return getPatternMatcher(match, escape).match(string);
 	}
 
-	public Match parse(Pattern pattern, String match, String string) {
-		Matcher m = pattern.matcher(string);
-		if(m.matches()) {
-			List<Object> data = Lists.newLinkedList();
-			Matcher ma = token.matcher(match);
-			for(int i = 0; i < m.groupCount(); i++) {
-				if(!ma.find()) {
-					throw new IllegalArgumentException("no match found!");
-				}
-				data.add(getType(ma.group(1)).valueOf(m.group(i + 1)));
-			}
-			return new Match(this, match, string, data);
-		}
-		return null;
+	public Match parse(PatternMatcher pattern, String string) {
+		// TODO REMOVE
+		return pattern.match(string);
 	}
 
 	public Pattern getPattern(String match, boolean escape) {
-		if(escape) {
-			return patternCacheEscape.getUnchecked(match);
-		} else {
-			return patternCache.getUnchecked(match);
-		}
+		// TODO REMOVE
+		return patternCache.getPattern(match, escape);
+	}
+
+	public PatternMatcher getPatternMatcher(String match, boolean escape) {
+		// TODO REMOVE
+		return patternMatcherCache.getPatternMatcher(match, escape);
 	}
 
 	public void reset() {
@@ -214,29 +211,12 @@ public final class ValueFactory implements ValueOf, ValueAnalyser {
 		}
 	}
 
-	public String toString(String match, List<Object> data) {
-		String ret = match;
-		Iterator<Object> it = data.iterator();
-		while(true) {
-			Matcher m = token.matcher(ret);
-			if(!m.find()) {
-				if(it.hasNext()) {
-					throw new IllegalArgumentException("too many arguments!");
-				}
-				return Util.removeRegexSpaces(ret);
-			}
-			if(!it.hasNext()) {
-				throw new IllegalArgumentException("too few arguments!");
-			}
-			ret = m.replaceFirst(Util.escape(Util.escape(getType(m.group()).format(it.next()))));
-		}
-	}
-
 	public Value getType(int index, String match) {
-		Matcher ma = token.matcher(match);
+		Matcher ma = Util.matchToken(match);
 		if(ma.find(index + 1)) {
 			return getType(ma.group(1));
 		}
 		throw new IllegalArgumentException();
 	}
+
 }

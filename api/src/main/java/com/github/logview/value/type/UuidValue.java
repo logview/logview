@@ -32,4 +32,12 @@ public class UuidValue extends AbstractCaseRegexValue {
 		}
 		return null;
 	}
+
+	@Override
+	public String format(Object data) {
+		if(data instanceof UUID) {
+			return data.toString();
+		}
+		return super.format(data);
+	}
 }

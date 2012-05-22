@@ -8,10 +8,10 @@ public class TaskRunner implements Runnable {
 	private final AtomicBoolean close;
 	private final AtomicInteger count;
 	private final Task task;
-	private final TaskManager taskManager;
+	private final TaskManager manager;
 
-	public TaskRunner(TaskManager taskManager, int id, AtomicBoolean close, AtomicInteger count, Task task) {
-		this.taskManager = taskManager;
+	public TaskRunner(TaskManager manager, int id, AtomicBoolean close, AtomicInteger count, Task task) {
+		this.manager = manager;
 		this.close = close;
 		this.count = count;
 		this.task = task;
@@ -41,7 +41,7 @@ public class TaskRunner implements Runnable {
 			}
 		} catch (Throwable t) {
 			System.err.println("aborted task " + name + " " + t.getMessage());
-			taskManager.abort();
+			manager.abort();
 			throw new RuntimeException(t);
 		} finally {
 			count.decrementAndGet();

@@ -7,39 +7,41 @@ import com.github.logview.api.LogEntry;
 import com.github.logview.io.Reader;
 import com.github.logview.io.Writer;
 import com.github.logview.matcher.Match;
-import com.github.logview.task.Task;
-import com.google.common.collect.ImmutableList;
+import com.github.logview.task.AbstractTask;
 import com.google.common.collect.Lists;
 
-public class EntryJoinerTask extends Task {
-	private final List<String> emptyList = ImmutableList.of();
+public class EntryJoinerTask extends AbstractTask {
+	private static final int SIZE = 5000;
+
 	private final List<String> lines = Lists.newLinkedList();
 	private final Reader<Match> matches;
 	private final Reader<String> extras;
-	private final Writer<LogEntry> writer;
+	private final Writer<List<LogEntry>> writer;
+	private List<LogEntry> cache = Lists.newArrayListWithCapacity(SIZE);
 	private long counter = 0;
 	private Entry<Long, Match> current;
 	private int step = 1;
 
-	public EntryJoinerTask(Reader<Match> matches, Reader<String> extras, Writer<LogEntry> writer) {
+	public EntryJoinerTask(Reader<Match> matches, Reader<String> extras, Writer<List<LogEntry>> writer) {
 		this.matches = matches;
 		this.extras = extras;
 		this.writer = writer;
 	}
 
 	private void write(Match match) {
-		write(match, emptyList);
-	}
-
-	private void write(Match match, List<String> lines) {
-		writer.write(counter, new LogEntry(counter, match, lines));
+		cache.add(new LogEntry(counter, match, lines));
+		if(cache.size() >= SIZE) {
+			writer.write(counter, cache);
+			cache = Lists.newArrayListWithCapacity(SIZE);
+		}
+		lines.clear();
 		current = null;
 		step = 1;
 		counter++;
 	}
 
 	@Override
-	protected boolean actionDo() {
+	public boolean actionDo() {
 		if(current == null) {
 			current = matches.read();
 			if(current == null) {

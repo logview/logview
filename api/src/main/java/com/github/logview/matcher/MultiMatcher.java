@@ -3,13 +3,14 @@ package com.github.logview.matcher;
 import java.util.List;
 import java.util.Properties;
 
+import com.github.logview.store.Store;
 import com.github.logview.value.api.ValueFactory;
 import com.google.common.collect.Lists;
 
-public class MultiMatcher implements Matcher {
+public class MultiMatcher implements LineMatcher {
 	protected final String key;
 	protected final ValueFactory factory;
-	private final List<ValueMatcher> matchers = Lists.newLinkedList();
+	private final List<PatternMatcher> matchers = Lists.newLinkedList();
 
 	public MultiMatcher(ValueFactory factory, String key) {
 		this.factory = factory;
@@ -33,7 +34,7 @@ public class MultiMatcher implements Matcher {
 			if(match == null) {
 				break;
 			}
-			add(match, true);
+			add(factory.getPatternMatcher(match, true));
 		}
 		return this;
 	}
@@ -41,7 +42,7 @@ public class MultiMatcher implements Matcher {
 	@Override
 	public Match match(String line) {
 		synchronized(matchers) {
-			for(Matcher matcher : matchers) {
+			for(LineMatcher matcher : matchers) {
 				Match ret = matcher.match(line);
 				if(ret != null) {
 					return ret;
@@ -51,9 +52,19 @@ public class MultiMatcher implements Matcher {
 		return null;
 	}
 
-	public boolean add(String match, boolean escape) {
+	public boolean add(PatternMatcher match) {
 		synchronized(matchers) {
-			return matchers.add(new ValueMatcher(factory, match, escape));
+			return matchers.add(match);
+		}
+	}
+
+	@Override
+	public void store(Store store) {
+		synchronized(matchers) {
+			store.storeInteger(matchers.size());
+			for(LineMatcher matcher : matchers) {
+				matcher.store(store);
+			}
 		}
 	}
 }

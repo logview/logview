@@ -1,11 +1,9 @@
 package com.github.logview.api;
 
-import com.github.logview.matcher.Match;
+import java.util.Map;
 
 public interface Tags {
-	Match getTag(String tag);
-
-	Match getTags(String tags);
+	void add(String tag, Map<String, Object> extra);
 
 	void close();
 }
