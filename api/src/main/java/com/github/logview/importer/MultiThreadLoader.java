@@ -1,6 +1,5 @@
 package com.github.logview.importer;
 
-import java.util.List;
 import java.util.Map.Entry;
 
 import com.github.logview.api.LogEntry;
@@ -16,14 +15,14 @@ public class MultiThreadLoader extends AbstractLoader {
 	private final Pipeline<Match> matchesCache = Pipelines.create("matchesCache");
 	private final Pipeline<String> extrasOrdered = Pipelines.create("extrasOrdered");
 	private final Pipeline<Match> matchesOrdered = Pipelines.create("matchesOrdered");
-	private final Pipeline<List<LogEntry>> entrys = Pipelines.create("entry");
+	private final Pipeline<LogEntry> entrys = Pipelines.create("entry");
 
-	public MultiThreadLoader(LineMatcher matcher, ReaderTask<List<LogEntry>> reader) {
+	public MultiThreadLoader(LineMatcher matcher, ReaderTask<LogEntry> reader) {
 		reader.setReader(entrys);
 		manager.add(new MatcherTask(strings, matchesCache, extrasCache, matcher), 8);
 		manager.add(new EntryOrdererTask(matchesCache, extrasCache, matchesOrdered, extrasOrdered), 1);
 		manager.add(new EntryJoinerTask(matchesOrdered, extrasOrdered, entrys), 1);
-		manager.add(reader, 8);
+		manager.add(reader, 1);
 	}
 
 	@Override

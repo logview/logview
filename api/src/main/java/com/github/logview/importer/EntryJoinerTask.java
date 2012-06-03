@@ -11,29 +11,22 @@ import com.github.logview.task.AbstractTask;
 import com.google.common.collect.Lists;
 
 public class EntryJoinerTask extends AbstractTask {
-	private static final int SIZE = 5000;
-
 	private final List<String> lines = Lists.newLinkedList();
 	private final Reader<Match> matches;
 	private final Reader<String> extras;
-	private final Writer<List<LogEntry>> writer;
-	private List<LogEntry> cache = Lists.newArrayListWithCapacity(SIZE);
-	private long counter = 0;
+	private final Writer<LogEntry> writer;
 	private Entry<Long, Match> current;
+	private long counter;
 	private int step = 1;
 
-	public EntryJoinerTask(Reader<Match> matches, Reader<String> extras, Writer<List<LogEntry>> writer) {
+	public EntryJoinerTask(Reader<Match> matches, Reader<String> extras, Writer<LogEntry> writer) {
 		this.matches = matches;
 		this.extras = extras;
 		this.writer = writer;
 	}
 
 	private void write(Match match) {
-		cache.add(new LogEntry(counter, match, lines));
-		if(cache.size() >= SIZE) {
-			writer.write(counter, cache);
-			cache = Lists.newArrayListWithCapacity(SIZE);
-		}
+		writer.write(counter, new LogEntry(counter, match, lines));
 		lines.clear();
 		current = null;
 		step = 1;

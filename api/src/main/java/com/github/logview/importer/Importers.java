@@ -3,6 +3,7 @@ package com.github.logview.importer;
 import java.io.File;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.prefs.Preferences;
 
 import com.github.logview.api.Loader;
 import com.github.logview.task.TaskListener;
@@ -11,6 +12,10 @@ import com.github.logview.util.AutomaticScanner;
 import com.github.logview.util.Util;
 
 public class Importers {
+	public static void loadPath(Loader loader, TaskMonitor monitor) throws Exception {
+		loadPath(loader, monitor, Preferences.userRoot().get("logpath", "."));
+	}
+
 	public static void loadPath(Loader loader, TaskMonitor monitor, String path) throws Exception {
 		File dir = new File(path);
 		for(File file : dir.listFiles()) {
@@ -23,7 +28,8 @@ public class Importers {
 		}
 	}
 
-	private static int TO = 100;
+	private static int TO = 16;
+	private static int lines = 1024;
 
 	public static void loadLog(Loader loader, TaskMonitor monitor, File file) throws Exception {
 		Scanner scanner = AutomaticScanner.create(file);
@@ -53,6 +59,9 @@ public class Importers {
 				}
 				loader.write(id, Util.trimRight(line));
 				id++;
+				if(id > lines) {
+					break;
+				}
 				/*
 				mb = bytes / 1024 / 1024 / 100;
 				if(mb != lastmb) {
