@@ -92,4 +92,10 @@ public class TaskManager extends AbstractTaskMonitor {
 		}
 		*/
 	}
+
+	public void flush() {
+		for(TaskPartManager manager : tasks) {
+			manager.flush();
+		}
+	}
 }

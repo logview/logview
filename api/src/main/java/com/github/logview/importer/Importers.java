@@ -28,8 +28,8 @@ public class Importers {
 		}
 	}
 
-	private static int TO = 16;
-	private static int lines = 1024;
+	private static int TO = 0;
+	private static int lines = 0;
 
 	public static void loadLog(Loader loader, TaskMonitor monitor, File file) throws Exception {
 		Scanner scanner = AutomaticScanner.create(file);
@@ -59,7 +59,7 @@ public class Importers {
 				}
 				loader.write(id, Util.trimRight(line));
 				id++;
-				if(id > lines) {
+				if(lines != 0 && id > lines) {
 					break;
 				}
 				/*

@@ -5,5 +5,7 @@ import com.github.logview.importer.Importer;
 public interface Loader extends Importer {
 	void load();
 
+	void flush();
+
 	void close();
 }

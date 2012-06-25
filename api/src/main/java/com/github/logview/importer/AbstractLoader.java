@@ -23,6 +23,11 @@ public abstract class AbstractLoader extends TaskMonitorWrapper implements Loade
 	}
 
 	@Override
+	public void flush() {
+		manager.flush();
+	}
+
+	@Override
 	public void close() {
 		manager.close();
 		manager.removeListener(this);

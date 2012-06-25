@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TaskRunner implements Runnable {
 	private final String name;
 	private final AtomicBoolean close;
+	private final AtomicBoolean flush;
 	private final AtomicInteger count;
 	private final Task task;
 	private final TaskManager manager;
@@ -16,6 +17,7 @@ public class TaskRunner implements Runnable {
 		this.count = count;
 		this.task = task;
 		this.name = task.getName() + " " + id;
+		this.flush = new AtomicBoolean();
 		count.incrementAndGet();
 	}
 
@@ -31,6 +33,9 @@ public class TaskRunner implements Runnable {
 			while(true) {
 				if(task.actionDo()) {
 					continue;
+				}
+				if(flush.getAndSet(false)) {
+					System.err.printf("flushed task %s!\n", name);
 				}
 				if(close.get()) {
 					task.actionFinished();
@@ -50,5 +55,18 @@ public class TaskRunner implements Runnable {
 			}
 			thread.setName(tname);
 		}
+	}
+
+	public void flush() {
+		System.err.printf("flushing task %s!\n", name);
+		flush.set(true);
+		while(flush.get()) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		System.err.printf("flushing task %s done!\n", name);
 	}
 }

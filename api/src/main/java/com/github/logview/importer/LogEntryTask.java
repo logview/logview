@@ -1,13 +1,14 @@
 package com.github.logview.importer;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import com.github.logview.api.LogEntry;
 import com.github.logview.task.AbstractReaderTask;
 import com.google.common.collect.Lists;
 
 public class LogEntryTask extends AbstractReaderTask<LogEntry> {
-	private final List<LogEntry> entrys = Lists.newLinkedList();
+	protected final LinkedList<LogEntry> entrys = Lists.newLinkedList();
 
 	@Override
 	public boolean actionDo() {
@@ -17,7 +18,12 @@ public class LogEntryTask extends AbstractReaderTask<LogEntry> {
 				return false;
 			}
 			entrys.add(e);
+			// System.err.println("add: " + e.getId());
+			update();
 		}
+	}
+
+	protected void update() {
 	}
 
 	@Override
@@ -30,7 +36,12 @@ public class LogEntryTask extends AbstractReaderTask<LogEntry> {
 		return "log entry";
 	}
 
-	public List<LogEntry> getEntrys() {
-		return entrys;
+	public ArrayList<LogEntry> getEntrys() {
+		if(entrys.size() == 0) {
+			throw new RuntimeException("");
+		}
+		ArrayList<LogEntry> ret = Lists.newArrayList(entrys);
+		entrys.clear();
+		return ret;
 	}
 }
