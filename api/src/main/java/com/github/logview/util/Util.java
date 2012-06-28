@@ -1,5 +1,7 @@
 package com.github.logview.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,9 +38,16 @@ public class Util {
 		return token.matcher(input);
 	}
 
+	public static Properties loadProps(String file) throws IOException {
+		return loadProps(new FileInputStream(new File(file)), file);
+	}
+
 	public static Properties loadProps(Class<?> clazz, String resource) throws IOException {
+		return loadProps(clazz.getResourceAsStream(resource), resource);
+	}
+
+	public static Properties loadProps(InputStream stream, String resource) throws IOException {
 		Properties props = new Properties();
-		InputStream stream = clazz.getResourceAsStream(resource);
 		if(stream == null) {
 			throw new FileNotFoundException(resource);
 		}
